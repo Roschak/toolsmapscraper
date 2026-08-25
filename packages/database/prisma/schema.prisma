@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  PAUSED
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum WebsiteStatus {
+  WEBSITE_LISTED
+  WEBSITE_DISCOVERED
+  NO_WEBSITE_LISTED
+  POSSIBLE_WEBSITE
+  WEBSITE_UNCERTAIN
+  SOCIAL_ONLY
+}
+
+enum EntityMatchConfidence {
+  EXACT_MATCH
+  HIGH_CONFIDENCE_MATCH
+  PROBABLE_MATCH
+  POSSIBLE_MATCH
+  NO_MATCH
+}
+
+enum LeadPriority {
+  HOT
+  HIGH
+  MEDIUM
+  LOW
+  VERY_LOW
+}
+
+enum LeadStatus {
+  NEW
+  RESEARCHED
+  DEMO_CREATED
+  DEMO_READY
+  CONTACTED
+  FOLLOW_UP
+  INTERESTED
+  NEGOTIATION
+  CLIENT
+  NO_RESPONSE
+  NOT_INTERESTED
+  LOST
+  ARCHIVED
+}
+
+enum DemoStatus {
+  NOT_CREATED
+  IN_PROGRESS
+  READY
+  SENT
+  APPROVED
+  REJECTED
+}
+
+enum SourceType {
+  GOOGLE_PLACES
+  FOURSQUARE
+  OVERTURE
+  GEOAPIFY
+  USER_IMPORT
+  MANUAL
+  OTHER_APPROVED_SOURCE
+}
+
+model BusinessEntity {
+  id               String   @id @default(uuid())
+  canonicalName    String
+  providerIds      Json?
+  country          String?
+  region           String?
+  city             String?
+  district         String?
+  address          String?
+  latitude         Float?
+  longitude        Float?
+  categories       String[]
+  primaryCategory  String?
+  businessModel    String?
+  legalEntity      String?
+  phone            String?
+  website          String?
+  socialLinks      Json?
+  rating           Float?
+  reviewCount      Int?
+  businessStatus   String?
+  sourceProviders  String[]
+  dataConfidence   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  lastVerifiedAt   DateTime?
+  
+  prospects        Prospect[]
+}
+
+model Prospect {
+  id                       String   @id @default(uuid())
+  businessEntityId         String?
+  businessEntity           BusinessEntity? @relation(fields: [businessEntityId], references: [id])
+  sourceType               SourceType
+  businessName             String
+  classification           String?
+  classificationConfidence Float?
+  businessModel            String?
+  businessModelConfidence  Float?
+  websiteStatus            WebsiteStatus @default(NO_WEBSITE_LISTED)
+  websiteUrl               String?
+  websiteConfidence        Float?
+  phone                    String?
+  country                  String?
+  region                   String?
+  city                     String?
+  address                  String?
+  rating                   Float?
+  reviewCount              Int?
+  businessStatus           String?
+  leadScore                Float?
+  priority                 LeadPriority?
+  leadStatus               LeadStatus @default(NEW)
+  demoStatus               DemoStatus @default(NOT_CREATED)
+  demoUrl                  String?
+  notes                    String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  lastVerifiedAt           DateTime?
+}
+
+model SearchJob {
+  id                      String   @id @default(uuid())
+  name                    String
+  country                 String?
+  region                  String?
+  city                    String?
+  district                String?
+  category                String?
+  keywords                String?
+  query                   String?
+  scope                   String?
+  provider                String?
+  status                  JobStatus @default(QUEUED)
+  progress                Float @default(0)
+  totalTasks              Int @default(0)
+  completedTasks          Int @default(0)
+  failedTasks             Int @default(0)
+  resultCount             Int @default(0)
+  duplicateCount          Int @default(0)
+  websiteListedCount      Int @default(0)
+  websiteOpportunityCount Int @default(0)
+  startedAt               DateTime?
+  completedAt             DateTime?
+  createdAt               DateTime @default(now())
+  error                   String?
+}
+
+model ExportJob {
+  id          String   @id @default(uuid())
+  query       Json?
+  status      JobStatus @default(QUEUED)
+  fileUrl     String?
+  recordCount Int @default(0)
+  error       String?
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+}
