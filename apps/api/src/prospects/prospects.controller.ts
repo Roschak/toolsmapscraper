@@ -1,41 +1,57 @@
-import { Controller, Get, Body, Patch, Param, Query } from '@nestjs/common';
+import { Controller, Get, Patch, Post, Delete, Param, Query, Body, Req } from '@nestjs/common';
 import { ProspectsService } from './prospects.service';
-import { LeadStatus, Prisma } from '@prisma/client';
+import type { LeadPriority, LeadStatus, UpdateProspectDto } from '@prospecthunter/shared';
 
 @Controller('prospects')
 export class ProspectsController {
-  constructor(private readonly prospectsService: ProspectsService) {}
+  constructor(private prospectsService: ProspectsService) {}
 
   @Get()
-  findAll(
-    @Query('skip') skip?: string,
-    @Query('take') take?: string,
-    @Query('status') status?: LeadStatus,
+  async findAll(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+    @Query('query') query?: string,
+    @Query('country') country?: string,
+    @Query('city') city?: string,
+    @Query('priority') priority?: LeadPriority,
+    @Query('leadStatus') leadStatus?: LeadStatus,
+    @Query('websiteOpportunityOnly') websiteOpportunityOnly?: string,
+    @Query('sortBy') sortBy?: 'leadScore' | 'rating' | 'createdAt',
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc'
   ) {
-    const where: Prisma.ProspectWhereInput = {};
-    if (status) {
-      where.leadStatus = status;
-    }
-    
     return this.prospectsService.findAll({
-      skip: skip ? Number(skip) : undefined,
-      take: take ? Number(take) : undefined,
-      where,
+      page: page ? parseInt(page, 10) : 1,
+      pageSize: pageSize ? parseInt(pageSize, 10) : 20,
+      query,
+      country,
+      city,
+      priority,
+      leadStatus,
+      websiteOpportunityOnly: websiteOpportunityOnly === 'true',
+      sortBy,
+      sortOrder,
     });
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.prospectsService.findOne(id);
   }
 
-  @Patch(':id/status')
-  updateStatus(@Param('id') id: string, @Body('status') status: LeadStatus) {
-    return this.prospectsService.updateStatus(id, status);
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() body: UpdateProspectDto) {
+    return this.prospectsService.update(id, body);
   }
 
-  @Patch(':id/notes')
-  addNote(@Param('id') id: string, @Body('notes') notes: string) {
-    return this.prospectsService.addNote(id, notes);
+  @Post(':id/notes')
+  async addNote(@Param('id') id: string, @Body('content') content: string, @Req() req: any) {
+    const authorName = req.user?.name || 'Sales Agent';
+    const authorId = req.user?.sub;
+    return this.prospectsService.addNote(id, content, authorName, authorId);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.prospectsService.delete(id);
   }
 }
