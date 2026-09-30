@@ -1,29 +1,33 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Query, Patch } from '@nestjs/common';
 import { SearchService } from './search.service';
-import { Prisma } from '@prisma/client';
+import type { CreateSearchJobDto } from '@prospecthunter/shared';
 
 @Controller('search')
 export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
+  constructor(private searchService: SearchService) {}
 
   @Post()
-  create(@Body() createSearchDto: Prisma.SearchJobCreateInput) {
-    return this.searchService.create(createSearchDto);
+  async create(@Body() body: CreateSearchJobDto) {
+    return this.searchService.create(body);
   }
 
   @Get()
-  findAll(
-    @Query('skip') skip?: string,
-    @Query('take') take?: string,
-  ) {
+  async findAll(@Query('page') page: string = '1', @Query('pageSize') pageSize: string = '20') {
+    const p = parseInt(page, 10) || 1;
+    const size = parseInt(pageSize, 10) || 20;
     return this.searchService.findAll({
-      skip: skip ? Number(skip) : undefined,
-      take: take ? Number(take) : undefined,
+      skip: (p - 1) * size,
+      take: size,
     });
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.searchService.findOne(id);
+  }
+
+  @Patch(':id/cancel')
+  async cancel(@Param('id') id: string) {
+    return this.searchService.cancel(id);
   }
 }

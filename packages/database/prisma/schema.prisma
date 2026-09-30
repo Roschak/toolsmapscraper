@@ -1,9 +1,17 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/client"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  SALES
+  ANALYST
+  VIEWER
 }
 
 enum JobStatus {
@@ -72,50 +80,86 @@ enum SourceType {
   GEOAPIFY
   USER_IMPORT
   MANUAL
+  MOCK_PROVIDER
   OTHER_APPROVED_SOURCE
 }
 
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  role         UserRole   @default(SALES)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  auditLogs    AuditLog[]
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+}
+
 model BusinessEntity {
-  id               String   @id @default(uuid())
-  canonicalName    String
-  providerIds      Json?
-  country          String?
-  region           String?
-  city             String?
-  district         String?
-  address          String?
-  latitude         Float?
-  longitude        Float?
-  categories       String[]
-  primaryCategory  String?
-  businessModel    String?
-  legalEntity      String?
-  phone            String?
-  website          String?
-  socialLinks      Json?
-  rating           Float?
-  reviewCount      Int?
-  businessStatus   String?
-  sourceProviders  String[]
-  dataConfidence   String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  lastVerifiedAt   DateTime?
-  
-  prospects        Prospect[]
+  id              String     @id @default(uuid())
+  canonicalName   String
+  providerIds     Json?
+  country         String?
+  region          String?
+  city            String?
+  district        String?
+  address         String?
+  latitude        Float?
+  longitude       Float?
+  categories      String[]
+  primaryCategory String?
+  businessModel   String?
+  legalEntity     String?
+  phone           String?
+  website         String?
+  socialLinks     Json?
+  rating          Float?
+  reviewCount     Int?
+  businessStatus  String?
+  sourceProviders String[]
+  dataConfidence  String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  lastVerifiedAt  DateTime?
+  prospects       Prospect[]
+
+  @@index([canonicalName])
+  @@index([country, city])
 }
 
 model Prospect {
-  id                       String   @id @default(uuid())
+  id                       String         @id @default(uuid())
   businessEntityId         String?
   businessEntity           BusinessEntity? @relation(fields: [businessEntityId], references: [id])
+  searchJobId              String?
+  searchJob                SearchJob?      @relation(fields: [searchJobId], references: [id])
   sourceType               SourceType
   businessName             String
   classification           String?
   classificationConfidence Float?
   businessModel            String?
   businessModelConfidence  Float?
-  websiteStatus            WebsiteStatus @default(NO_WEBSITE_LISTED)
+  websiteStatus            WebsiteStatus  @default(NO_WEBSITE_LISTED)
   websiteUrl               String?
   websiteConfidence        Float?
   phone                    String?
@@ -123,22 +167,46 @@ model Prospect {
   region                   String?
   city                     String?
   address                  String?
+  latitude                 Float?
+  longitude                Float?
   rating                   Float?
   reviewCount              Int?
   businessStatus           String?
   leadScore                Float?
   priority                 LeadPriority?
-  leadStatus               LeadStatus @default(NEW)
-  demoStatus               DemoStatus @default(NOT_CREATED)
+  leadStatus               LeadStatus     @default(NEW)
+  demoStatus               DemoStatus     @default(NOT_CREATED)
   demoUrl                  String?
   notes                    String?
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  assignedTo               String?
+  tags                     String[]
+  customFields             Json?
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
   lastVerifiedAt           DateTime?
+  leadNotes                LeadNote[]
+
+  @@index([leadStatus])
+  @@index([priority])
+  @@index([websiteStatus])
+  @@index([country, city])
+  @@index([leadScore])
+}
+
+model LeadNote {
+  id         String   @id @default(uuid())
+  prospectId String
+  prospect   Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  authorId   String?
+  authorName String?
+  content    String
+  createdAt  DateTime @default(now())
+
+  @@index([prospectId])
 }
 
 model SearchJob {
-  id                      String   @id @default(uuid())
+  id                      String     @id @default(uuid())
   name                    String
   country                 String?
   region                  String?
@@ -149,28 +217,34 @@ model SearchJob {
   query                   String?
   scope                   String?
   provider                String?
-  status                  JobStatus @default(QUEUED)
-  progress                Float @default(0)
-  totalTasks              Int @default(0)
-  completedTasks          Int @default(0)
-  failedTasks             Int @default(0)
-  resultCount             Int @default(0)
-  duplicateCount          Int @default(0)
-  websiteListedCount      Int @default(0)
-  websiteOpportunityCount Int @default(0)
+  status                  JobStatus  @default(QUEUED)
+  progress                Float      @default(0)
+  totalTasks              Int        @default(0)
+  completedTasks          Int        @default(0)
+  failedTasks             Int        @default(0)
+  resultCount             Int        @default(0)
+  duplicateCount          Int        @default(0)
+  websiteListedCount      Int        @default(0)
+  websiteOpportunityCount Int        @default(0)
   startedAt               DateTime?
   completedAt             DateTime?
-  createdAt               DateTime @default(now())
+  createdAt               DateTime   @default(now())
   error                   String?
+  prospects               Prospect[]
+
+  @@index([status])
 }
 
 model ExportJob {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
+  format      String    @default("CSV")
   query       Json?
   status      JobStatus @default(QUEUED)
   fileUrl     String?
-  recordCount Int @default(0)
+  recordCount Int       @default(0)
   error       String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   completedAt DateTime?
+
+  @@index([status])
 }
