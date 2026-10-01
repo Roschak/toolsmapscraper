@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { LeadPriority, LeadStatus, UpdateProspectDto } from '@prospecthunter/shared';
+import { ClassificationEngine } from '@prospecthunter/classification';
+import { WebsiteDiscoveryEngine } from '@prospecthunter/website-discovery';
+import { LeadScoringEngine } from '@prospecthunter/lead-scoring';
 
 @Injectable()
 export class ProspectsService {
@@ -145,4 +148,121 @@ export class ProspectsService {
       where: { id },
     });
   }
+
+  async importLeads(records: Array<{
+    businessName: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    region?: string;
+    country?: string;
+    website?: string;
+    category?: string;
+  }>) {
+    let importedCount = 0;
+    const results: any[] = [];
+
+    for (const record of records) {
+      if (!record.businessName || !record.businessName.trim()) continue;
+
+      const classification = ClassificationEngine.classify(
+        record.businessName,
+        record.category ? [record.category] : []
+      );
+
+      const webAnalysis = WebsiteDiscoveryEngine.analyze({
+        rawWebsite: record.website,
+        businessName: record.businessName,
+      });
+
+      const scoring = LeadScoringEngine.calculate({
+        websiteStatus: webAnalysis.websiteStatus,
+        rating: 4.0,
+        reviewCount: 20,
+        phone: record.phone,
+        address: record.address,
+      });
+
+      // Find or create business entity
+      let businessEntity = await this.prisma.businessEntity.findFirst({
+        where: {
+          canonicalName: { equals: record.businessName.trim(), mode: 'insensitive' },
+        },
+      });
+
+      if (!businessEntity) {
+        businessEntity = await this.prisma.businessEntity.create({
+          data: {
+            canonicalName: record.businessName.trim(),
+            country: record.country || 'Indonesia',
+            region: record.region || 'DKI Jakarta',
+            city: record.city || 'Jakarta',
+            address: record.address,
+            phone: record.phone,
+            website: webAnalysis.websiteUrl,
+            categories: record.category ? [record.category] : ['Commercial'],
+            primaryCategory: classification.subCategory,
+            businessModel: classification.businessModel,
+            sourceProviders: ['USER_IMPORT'],
+            dataConfidence: 'USER_PROVIDED',
+          },
+        });
+      }
+
+      const tags = ['USER_IMPORT', classification.industry];
+      if (webAnalysis.isOpportunity) tags.push('NO_WEBSITE_OPPORTUNITY');
+      if (scoring.priority === 'HOT') tags.push('HOT_LEAD');
+
+      const prospect = await this.prisma.prospect.create({
+        data: {
+          businessEntityId: businessEntity.id,
+          sourceType: 'USER_IMPORT',
+          businessName: record.businessName.trim(),
+          classification: classification.subCategory,
+          classificationConfidence: classification.classificationConfidence,
+          businessModel: classification.businessModel,
+          businessModelConfidence: classification.businessModelConfidence,
+          websiteStatus: webAnalysis.websiteStatus,
+          websiteUrl: webAnalysis.websiteUrl,
+          websiteConfidence: webAnalysis.websiteConfidence,
+          phone: record.phone,
+          country: record.country || 'Indonesia',
+          region: record.region || 'DKI Jakarta',
+          city: record.city || 'Jakarta',
+          address: record.address,
+          leadScore: scoring.score,
+          priority: scoring.priority,
+          leadStatus: 'NEW',
+          demoStatus: 'NOT_CREATED',
+          notes: webAnalysis.notes,
+          tags,
+        },
+      });
+
+      results.push(prospect);
+      importedCount++;
+    }
+
+    return {
+      success: true,
+      importedCount,
+      prospects: results,
+    };
+  }
+
+  async bulkUpdateStatus(ids: string[], leadStatus: LeadStatus) {
+    const result = await this.prisma.prospect.updateMany({
+      where: { id: { in: ids } },
+      data: { leadStatus },
+    });
+    return { success: true, count: result.count };
+  }
+
+  async bulkDelete(ids: string[]) {
+    const result = await this.prisma.prospect.deleteMany({
+      where: { id: { in: ids } },
+    });
+    return { success: true, count: result.count };
+  }
 }
+
