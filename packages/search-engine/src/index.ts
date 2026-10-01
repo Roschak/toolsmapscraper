@@ -3,7 +3,7 @@ import { ClassificationEngine } from '@prospecthunter/classification';
 import { WebsiteDiscoveryEngine } from '@prospecthunter/website-discovery';
 import { LeadScoringEngine } from '@prospecthunter/lead-scoring';
 import { EntityResolutionEngine } from '@prospecthunter/entity-resolution';
-import { ProspectDto, SourceType } from '@prospecthunter/shared';
+import { SourceType } from '@prospecthunter/shared';
 
 export interface EnrichedProspectCandidate {
   raw: RawBusinessRecord;
