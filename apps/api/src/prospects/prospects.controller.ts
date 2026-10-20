@@ -54,4 +54,20 @@ export class ProspectsController {
   async delete(@Param('id') id: string) {
     return this.prospectsService.delete(id);
   }
+
+  @Post('import')
+  async importLeads(@Body() body: { records: any[] }) {
+    return this.prospectsService.importLeads(body.records || []);
+  }
+
+  @Post('bulk-status')
+  async bulkUpdateStatus(@Body() body: { ids: string[]; status: LeadStatus }) {
+    return this.prospectsService.bulkUpdateStatus(body.ids || [], body.status);
+  }
+
+  @Post('bulk-delete')
+  async bulkDelete(@Body() body: { ids: string[] }) {
+    return this.prospectsService.bulkDelete(body.ids || []);
+  }
 }
+

@@ -17,18 +17,13 @@
     "db:stop": "powershell -Command \"& 'C:\\Program Files\\PostgreSQL\\18\\bin\\pg_ctl.exe' -D './data/pgdata' stop\"",
     "db:status": "powershell -Command \"& 'C:\\Program Files\\PostgreSQL\\18\\bin\\pg_ctl.exe' -D './data/pgdata' status\"",
     "seed": "node scripts/seed.ts",
-    "test": "pnpm -r run test",
+    "test": "node --test tests/pipeline.test.mjs",
+    "test:all": "pnpm -r run test",
     "lint": "pnpm -r run lint"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
     "@types/pg": "^8.23.1",
     "typescript": "^5.7.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "@types/react": "18.3.18",
-      "@types/react-dom": "18.3.5"
-    }
   }
 }

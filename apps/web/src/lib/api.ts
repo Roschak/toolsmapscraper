@@ -87,12 +87,85 @@ export interface DashboardStats {
   recentJobs: SearchJob[];
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+export const API_BASE_URL = API_BASE;
+
+export function getAuthToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('token');
+}
+
+export function setAuthToken(token: string) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('token', token);
+  }
+}
+
+export function removeAuthToken() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
+}
+
+export function getCurrentUser() {
+  if (typeof window === 'undefined') return null;
+  const userStr = localStorage.getItem('user');
+  try {
+    return userStr ? JSON.parse(userStr) : null;
+  } catch {
+    return null;
+  }
+}
+
+function getAuthHeaders(): Record<string, string> {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+export async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options.headers as Record<string, string>),
+  };
+
+  const url = `${API_BASE}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const res = await fetch(url, {
+    ...options,
+    headers,
+  });
+
+  if (!res.ok) {
+    if (res.status === 401 && typeof window !== 'undefined') {
+      removeAuthToken();
+      window.location.href = '/login';
+    }
+    let errorMsg = `API Request failed with status ${res.status}`;
+    try {
+      const errorData = await res.json();
+      errorMsg = errorData.message || errorMsg;
+    } catch {}
+    throw new Error(errorMsg);
+  }
+
+  return res.json();
+}
 
 export const api = {
   async getDashboardStats(): Promise<DashboardStats> {
     try {
-      const res = await fetch(`${API_BASE_URL}/analytics/stats`, { cache: 'no-store' });
+      const res = await fetch(`${API_BASE_URL}/analytics/stats`, {
+        cache: 'no-store',
+        headers: getAuthHeaders(),
+      });
       if (res.ok) {
         return await res.json();
       }
@@ -152,31 +225,40 @@ export const api = {
   },
 
   async getProspects(params: {
-    page?: number;
-    pageSize?: number;
     query?: string;
-    country?: string;
     city?: string;
+    category?: string;
     priority?: string;
     leadStatus?: string;
     websiteOpportunityOnly?: boolean;
+    page?: number;
+    pageSize?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
-  } = {}): Promise<{ items: Prospect[]; total: number; page: number; pageSize: number; totalPages: number }> {
+  } = {}): Promise<{
+    items: Prospect[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
     try {
       const url = new URL(`${API_BASE_URL}/prospects`);
-      if (params.page) url.searchParams.set('page', params.page.toString());
-      if (params.pageSize) url.searchParams.set('pageSize', params.pageSize.toString());
       if (params.query) url.searchParams.set('query', params.query);
-      if (params.country) url.searchParams.set('country', params.country);
       if (params.city) url.searchParams.set('city', params.city);
-      if (params.priority && params.priority !== 'ALL') url.searchParams.set('priority', params.priority);
-      if (params.leadStatus && params.leadStatus !== 'ALL') url.searchParams.set('leadStatus', params.leadStatus);
+      if (params.category) url.searchParams.set('category', params.category);
+      if (params.priority) url.searchParams.set('priority', params.priority);
+      if (params.leadStatus) url.searchParams.set('leadStatus', params.leadStatus);
       if (params.websiteOpportunityOnly) url.searchParams.set('websiteOpportunityOnly', 'true');
+      if (params.page) url.searchParams.set('page', String(params.page));
+      if (params.pageSize) url.searchParams.set('pageSize', String(params.pageSize));
       if (params.sortBy) url.searchParams.set('sortBy', params.sortBy);
       if (params.sortOrder) url.searchParams.set('sortOrder', params.sortOrder);
 
-      const res = await fetch(url.toString(), { cache: 'no-store' });
+      const res = await fetch(url.toString(), {
+        cache: 'no-store',
+        headers: getAuthHeaders(),
+      });
       if (res.ok) {
         return await res.json();
       }
@@ -195,7 +277,10 @@ export const api = {
 
   async getProspectById(id: string): Promise<Prospect | null> {
     try {
-      const res = await fetch(`${API_BASE_URL}/prospects/${id}`, { cache: 'no-store' });
+      const res = await fetch(`${API_BASE_URL}/prospects/${id}`, {
+        cache: 'no-store',
+        headers: getAuthHeaders(),
+      });
       if (res.ok) {
         return await res.json();
       }
@@ -208,7 +293,7 @@ export const api = {
   async updateProspect(id: string, data: Partial<Prospect>): Promise<Prospect> {
     const res = await fetch(`${API_BASE_URL}/prospects/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!res.ok) {
@@ -220,7 +305,7 @@ export const api = {
   async addProspectNote(id: string, content: string, authorName = 'Lead Architect'): Promise<any> {
     const res = await fetch(`${API_BASE_URL}/prospects/${id}/notes`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ content, authorName }),
     });
     if (!res.ok) {
@@ -231,7 +316,10 @@ export const api = {
 
   async getSearchJobs(): Promise<{ items: SearchJob[]; total: number }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/search`, { cache: 'no-store' });
+      const res = await fetch(`${API_BASE_URL}/search`, {
+        cache: 'no-store',
+        headers: getAuthHeaders(),
+      });
       if (res.ok) {
         return await res.json();
       }
@@ -254,7 +342,7 @@ export const api = {
   }): Promise<SearchJob> {
     const res = await fetch(`${API_BASE_URL}/search`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!res.ok) {
@@ -265,7 +353,10 @@ export const api = {
 
   async getSettings(): Promise<Record<string, any>> {
     try {
-      const res = await fetch(`${API_BASE_URL}/settings`, { cache: 'no-store' });
+      const res = await fetch(`${API_BASE_URL}/settings`, {
+        cache: 'no-store',
+        headers: getAuthHeaders(),
+      });
       if (res.ok) {
         return await res.json();
       }
@@ -285,7 +376,7 @@ export const api = {
   async updateSettings(data: Record<string, any>): Promise<any> {
     const res = await fetch(`${API_BASE_URL}/settings`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!res.ok) {
@@ -297,7 +388,7 @@ export const api = {
   async triggerExport(format: 'CSV' | 'JSON', filters?: any): Promise<any> {
     const res = await fetch(`${API_BASE_URL}/export`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ format, filters }),
     });
     if (!res.ok) {
@@ -312,12 +403,27 @@ export const api = {
 
   async checkHealth(): Promise<{ online: boolean; prospectCount: number }> {
     try {
-      const res = await fetch(`${API_BASE_URL}/analytics/stats`, { cache: 'no-store' });
+      const res = await fetch(`${API_BASE_URL}/analytics/stats`, {
+        cache: 'no-store',
+        headers: getAuthHeaders(),
+      });
       if (res.ok) {
         const data = await res.json();
         return { online: true, prospectCount: data.totalProspects || 0 };
       }
     } catch {}
     return { online: false, prospectCount: 0 };
+  },
+
+  async importProspects(records: any[]): Promise<{ importedCount: number }> {
+    const res = await fetch(`${API_BASE_URL}/prospects/import`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ records }),
+    });
+    if (!res.ok) {
+      throw new Error('Failed to import prospects');
+    }
+    return await res.json();
   },
 };

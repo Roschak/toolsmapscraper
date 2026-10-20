@@ -99,6 +99,7 @@ function ProspectsContent() {
 
   useEffect(() => {
     loadProspects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cityFilter, websiteFilter, priorityFilter, statusFilter]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
