@@ -147,3 +147,6 @@ export class SearchEngine {
     };
   }
 }
+
+// Runtime value for interface
+export const EnrichedProspectCandidate = {};

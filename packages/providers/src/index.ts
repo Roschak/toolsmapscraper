@@ -258,3 +258,8 @@ export class ProviderRegistry {
 }
 
 export const providerRegistry = new ProviderRegistry();
+
+// Runtime values for interfaces
+export const RawBusinessRecord = {};
+export const ProviderSearchParams = {};
+export const BusinessProvider = {};

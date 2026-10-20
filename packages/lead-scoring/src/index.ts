@@ -101,3 +101,6 @@ export class LeadScoringEngine {
     };
   }
 }
+
+// Runtime value for interface
+export const LeadScoreResult = {};

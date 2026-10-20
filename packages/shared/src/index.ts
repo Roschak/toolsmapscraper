@@ -1,5 +1,11 @@
 // User & Auth
-export type UserRole = 'ADMIN' | 'SALES' | 'ANALYST' | 'VIEWER';
+export const UserRole = {
+  ADMIN: 'ADMIN',
+  SALES: 'SALES',
+  ANALYST: 'ANALYST',
+  VIEWER: 'VIEWER',
+} as const;
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 export interface UserDto {
   id: string;
@@ -28,55 +34,72 @@ export interface AuthResponse {
 }
 
 // Prospect & Discovery
-export type WebsiteStatus =
-  | 'WEBSITE_LISTED'
-  | 'WEBSITE_DISCOVERED'
-  | 'NO_WEBSITE_LISTED'
-  | 'POSSIBLE_WEBSITE'
-  | 'WEBSITE_UNCERTAIN'
-  | 'SOCIAL_ONLY';
+export const WebsiteStatus = {
+  WEBSITE_LISTED: 'WEBSITE_LISTED',
+  WEBSITE_DISCOVERED: 'WEBSITE_DISCOVERED',
+  NO_WEBSITE_LISTED: 'NO_WEBSITE_LISTED',
+  POSSIBLE_WEBSITE: 'POSSIBLE_WEBSITE',
+  WEBSITE_UNCERTAIN: 'WEBSITE_UNCERTAIN',
+  SOCIAL_ONLY: 'SOCIAL_ONLY',
+} as const;
+export type WebsiteStatus = (typeof WebsiteStatus)[keyof typeof WebsiteStatus];
 
-export type EntityMatchConfidence =
-  | 'EXACT_MATCH'
-  | 'HIGH_CONFIDENCE_MATCH'
-  | 'PROBABLE_MATCH'
-  | 'POSSIBLE_MATCH'
-  | 'NO_MATCH';
+export const EntityMatchConfidence = {
+  EXACT_MATCH: 'EXACT_MATCH',
+  HIGH_CONFIDENCE_MATCH: 'HIGH_CONFIDENCE_MATCH',
+  PROBABLE_MATCH: 'PROBABLE_MATCH',
+  POSSIBLE_MATCH: 'POSSIBLE_MATCH',
+  NO_MATCH: 'NO_MATCH',
+} as const;
+export type EntityMatchConfidence = (typeof EntityMatchConfidence)[keyof typeof EntityMatchConfidence];
 
-export type LeadPriority = 'HOT' | 'HIGH' | 'MEDIUM' | 'LOW' | 'VERY_LOW';
+export const LeadPriority = {
+  HOT: 'HOT',
+  HIGH: 'HIGH',
+  MEDIUM: 'MEDIUM',
+  LOW: 'LOW',
+  VERY_LOW: 'VERY_LOW',
+} as const;
+export type LeadPriority = (typeof LeadPriority)[keyof typeof LeadPriority];
 
-export type LeadStatus =
-  | 'NEW'
-  | 'RESEARCHED'
-  | 'DEMO_CREATED'
-  | 'DEMO_READY'
-  | 'CONTACTED'
-  | 'FOLLOW_UP'
-  | 'INTERESTED'
-  | 'NEGOTIATION'
-  | 'CLIENT'
-  | 'NO_RESPONSE'
-  | 'NOT_INTERESTED'
-  | 'LOST'
-  | 'ARCHIVED';
+export const LeadStatus = {
+  NEW: 'NEW',
+  RESEARCHED: 'RESEARCHED',
+  DEMO_CREATED: 'DEMO_CREATED',
+  DEMO_READY: 'DEMO_READY',
+  CONTACTED: 'CONTACTED',
+  FOLLOW_UP: 'FOLLOW_UP',
+  INTERESTED: 'INTERESTED',
+  NEGOTIATION: 'NEGOTIATION',
+  CLIENT: 'CLIENT',
+  NO_RESPONSE: 'NO_RESPONSE',
+  NOT_INTERESTED: 'NOT_INTERESTED',
+  LOST: 'LOST',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+export type LeadStatus = (typeof LeadStatus)[keyof typeof LeadStatus];
 
-export type DemoStatus =
-  | 'NOT_CREATED'
-  | 'IN_PROGRESS'
-  | 'READY'
-  | 'SENT'
-  | 'APPROVED'
-  | 'REJECTED';
+export const DemoStatus = {
+  NOT_CREATED: 'NOT_CREATED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  READY: 'READY',
+  SENT: 'SENT',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+export type DemoStatus = (typeof DemoStatus)[keyof typeof DemoStatus];
 
-export type SourceType =
-  | 'GOOGLE_PLACES'
-  | 'FOURSQUARE'
-  | 'OVERTURE'
-  | 'GEOAPIFY'
-  | 'USER_IMPORT'
-  | 'MANUAL'
-  | 'MOCK_PROVIDER'
-  | 'OTHER_APPROVED_SOURCE';
+export const SourceType = {
+  GOOGLE_PLACES: 'GOOGLE_PLACES',
+  FOURSQUARE: 'FOURSQUARE',
+  OVERTURE: 'OVERTURE',
+  GEOAPIFY: 'GEOAPIFY',
+  USER_IMPORT: 'USER_IMPORT',
+  MANUAL: 'MANUAL',
+  MOCK_PROVIDER: 'MOCK_PROVIDER',
+  OTHER_APPROVED_SOURCE: 'OTHER_APPROVED_SOURCE',
+} as const;
+export type SourceType = (typeof SourceType)[keyof typeof SourceType];
 
 export interface BusinessEntityDto {
   id: string;
@@ -167,13 +190,15 @@ export interface UpdateProspectDto {
 }
 
 // Search Jobs
-export type JobStatus =
-  | 'QUEUED'
-  | 'RUNNING'
-  | 'PAUSED'
-  | 'COMPLETED'
-  | 'FAILED'
-  | 'CANCELLED';
+export const JobStatus = {
+  QUEUED: 'QUEUED',
+  RUNNING: 'RUNNING',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+} as const;
+export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus];
 
 export interface CreateSearchJobDto {
   name: string;
@@ -267,3 +292,20 @@ export interface DashboardStatsDto {
   leadStatusBreakdown: { status: LeadStatus; count: number }[];
   recentJobs: SearchJobDto[];
 }
+
+// Runtime object values for TS interfaces
+export const UserDto = {};
+export const LoginDto = {};
+export const RegisterDto = {};
+export const AuthResponse = {};
+export const BusinessEntityDto = {};
+export const LeadNoteDto = {};
+export const ProspectDto = {};
+export const UpdateProspectDto = {};
+export const CreateSearchJobDto = {};
+export const SearchJobDto = {};
+export const CreateExportDto = {};
+export const ExportJobDto = {};
+export const ApiResponse = {};
+export const PaginatedResponse = {};
+export const DashboardStatsDto = {};
