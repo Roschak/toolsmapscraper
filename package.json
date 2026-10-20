@@ -11,6 +11,12 @@
   "scripts": {
     "dev": "pnpm -r --parallel run dev",
     "build": "pnpm -r run build",
+    "start": "pnpm --filter web start -p 3005",
+    "api": "node apps/api/dist/main.js",
+    "db:start": "powershell -Command \"& 'C:\\Program Files\\PostgreSQL\\18\\bin\\pg_ctl.exe' -D './data/pgdata' -l './data/postgres.log' -o '-p 5433' start\"",
+    "db:stop": "powershell -Command \"& 'C:\\Program Files\\PostgreSQL\\18\\bin\\pg_ctl.exe' -D './data/pgdata' stop\"",
+    "db:status": "powershell -Command \"& 'C:\\Program Files\\PostgreSQL\\18\\bin\\pg_ctl.exe' -D './data/pgdata' status\"",
+    "seed": "node scripts/seed.ts",
     "test": "node --test tests/pipeline.test.mjs",
     "test:all": "pnpm -r run test",
     "lint": "pnpm -r run lint"

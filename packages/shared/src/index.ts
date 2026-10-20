@@ -1,3 +1,4 @@
+// User & Auth
 export const UserRole = {
   ADMIN: 'ADMIN',
   SALES: 'SALES',
@@ -98,7 +99,6 @@ export const SourceType = {
   MOCK_PROVIDER: 'MOCK_PROVIDER',
   OTHER_APPROVED_SOURCE: 'OTHER_APPROVED_SOURCE',
 } as const;
-
 export type SourceType = (typeof SourceType)[keyof typeof SourceType];
 
 export interface BusinessEntityDto {
@@ -190,13 +190,15 @@ export interface UpdateProspectDto {
 }
 
 // Search Jobs
-export type JobStatus =
-  | 'QUEUED'
-  | 'RUNNING'
-  | 'PAUSED'
-  | 'COMPLETED'
-  | 'FAILED'
-  | 'CANCELLED';
+export const JobStatus = {
+  QUEUED: 'QUEUED',
+  RUNNING: 'RUNNING',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+} as const;
+export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus];
 
 export interface CreateSearchJobDto {
   name: string;
@@ -290,3 +292,20 @@ export interface DashboardStatsDto {
   leadStatusBreakdown: { status: LeadStatus; count: number }[];
   recentJobs: SearchJobDto[];
 }
+
+// Runtime object values for TS interfaces
+export const UserDto = {};
+export const LoginDto = {};
+export const RegisterDto = {};
+export const AuthResponse = {};
+export const BusinessEntityDto = {};
+export const LeadNoteDto = {};
+export const ProspectDto = {};
+export const UpdateProspectDto = {};
+export const CreateSearchJobDto = {};
+export const SearchJobDto = {};
+export const CreateExportDto = {};
+export const ExportJobDto = {};
+export const ApiResponse = {};
+export const PaginatedResponse = {};
+export const DashboardStatsDto = {};

@@ -128,3 +128,6 @@ export class EntityResolutionEngine {
     };
   }
 }
+
+// Runtime value for interface
+export const ResolutionComparison = {};

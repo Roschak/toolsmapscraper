@@ -90,3 +90,6 @@ export class ClassificationEngine {
     };
   }
 }
+
+// Runtime value for interface
+export const ClassificationResult = {};

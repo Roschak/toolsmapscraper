@@ -78,3 +78,6 @@ export class WebsiteDiscoveryEngine {
     };
   }
 }
+
+// Runtime value for interface
+export const WebsiteAnalysisResult = {};

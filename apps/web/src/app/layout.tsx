@@ -1,13 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
-import Navigation from '../components/Navigation';
-
-const inter = Inter({ subsets: ['latin'] });
+import { AppShell } from '../components/AppShell';
 
 export const metadata: Metadata = {
-  title: 'ProspectHunter - Global Lead Intelligence & Discovery',
-  description: 'Enterprise Business Prospect Discovery, Website Opportunity Detection, and Sales Pipeline Platform.',
+  title: 'ProspectHunter | Global Sales Intelligence & Opportunity Detection',
+  description: 'Enterprise B2B Business Prospect Discovery & Website Opportunity Intelligence Platform',
 };
 
 export default function RootLayout({
@@ -16,9 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Navigation>{children}</Navigation>
+    <html lang="en" className="dark">
+      <body className="bg-[#080c14] text-slate-100 min-h-screen antialiased selection:bg-cyan-500/20 selection:text-cyan-200">
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

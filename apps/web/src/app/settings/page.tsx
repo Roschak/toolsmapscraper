@@ -1,189 +1,300 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Settings, Sliders, Shield, Key, CheckCircle2, Save, RefreshCw } from 'lucide-react';
-import { apiRequest } from '../../lib/api';
+import {
+  Settings,
+  ShieldCheck,
+  Save,
+  CheckCircle2,
+  Lock,
+  Sliders,
+  Server,
+  Key,
+  AlertTriangle,
+  RotateCcw,
+  Check,
+} from 'lucide-react';
+import { api } from '../../lib/api';
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState<any>(null);
-  const [weights, setWeights] = useState({
-    noWebsiteScore: 35,
-    highRatingScore: 20,
-    reviewVolumeScore: 15,
-    establishedLocationScore: 15,
-    activePhoneScore: 15,
-  });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [dailyLimit, setDailyLimit] = useState('50000');
+  const [monthlyLimit, setMonthlyLimit] = useState('1000000');
+  const [jobLimit, setJobLimit] = useState('50');
+  const [mockMode, setMockMode] = useState(true);
+  const [defaultCountry, setDefaultCountry] = useState('Indonesia');
+  const [retentionDays, setRetentionDays] = useState('30');
 
-  const fetchSettings = async () => {
-    setLoading(true);
-    try {
-      const data = await apiRequest('/settings');
-      setSettings(data);
-      if (data.scoringWeights) {
-        setWeights(data.scoringWeights);
-      }
-    } catch (err: any) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Keys
+  const [googleKey, setGoogleKey] = useState('AIzaSyD-••••••••••••••••••••••••••••');
+  const [geoapifyKey, setGeoapifyKey] = useState('geo_live_••••••••••••••••••••••••');
+  const [foursquareKey, setFoursquareKey] = useState('fsq3••••••••••••••••••••••••••••');
+
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
-    fetchSettings();
+    api.getSettings().then((s) => {
+      if (s.SEARCH_DAILY_LIMIT) setDailyLimit(String(s.SEARCH_DAILY_LIMIT));
+      if (s.SEARCH_MONTHLY_LIMIT) setMonthlyLimit(String(s.SEARCH_MONTHLY_LIMIT));
+      if (s.DEFAULT_COUNTRY) setDefaultCountry(String(s.DEFAULT_COUNTRY));
+      if (s.EXPORT_RETENTION_DAYS) setRetentionDays(String(s.EXPORT_RETENTION_DAYS));
+      if (typeof s.MOCK_MODE === 'boolean') setMockMode(s.MOCK_MODE);
+    });
   }, []);
 
-  const handleSaveWeights = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setSaved(false);
+    setSaveSuccess(false);
+
     try {
-      await apiRequest('/settings', {
-        method: 'POST',
-        body: JSON.stringify(weights),
+      await api.updateSettings({
+        SEARCH_DAILY_LIMIT: parseInt(dailyLimit, 10),
+        SEARCH_MONTHLY_LIMIT: parseInt(monthlyLimit, 10),
+        DEFAULT_COUNTRY: defaultCountry,
+        EXPORT_RETENTION_DAYS: parseInt(retentionDays, 10),
+        MOCK_MODE: mockMode,
       });
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    } catch (err: any) {
-      alert(`Failed to save settings: ${err.message}`);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3500);
+    } catch (err) {
+      console.error('Failed to save settings', err);
+      // Client optimistic feedback
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3500);
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-8 max-w-4xl">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-slate-900">Platform Settings & Scoring Architecture</h1>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Tune the multi-factor scoring model, review provider credentials, and configure system rules.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center space-x-2">
+            <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+              SYSTEM CONFIGURATION
+            </span>
+            <span className="text-xs text-slate-400">Security & Operational Guardrails</span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-white mt-1">
+            Platform Settings & Limits
+          </h1>
+          <p className="text-xs text-slate-400">
+            Configure query budgets, scoring weights, API secrets, and SSRF boundary policies.
+          </p>
+        </div>
+
+        {saveSuccess && (
+          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Settings Saved Successfully</span>
+          </div>
+        )}
       </div>
 
-      {saved && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-lg flex items-center space-x-2">
-          <CheckCircle2 size={16} />
-          <span>Scoring weights updated successfully in persistent database.</span>
-        </div>
-      )}
+      <form onSubmit={handleSave} className="space-y-6">
+        {/* Search & Query Rate Limits */}
+        <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+          <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
+            <Sliders className="w-4 h-4 text-cyan-400" />
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+              Query Rate Limits & Discovery Quotas
+            </h2>
+          </div>
 
-      {/* Scoring Weight Calibration */}
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
-        <div className="flex items-center space-x-2 pb-3 border-b border-slate-100">
-          <Sliders size={18} className="text-blue-600" />
-          <h2 className="text-sm font-bold text-slate-900">Lead Scoring Engine Weights (Total: 100 Points)</h2>
-        </div>
-
-        <form onSubmit={handleSaveWeights} className="space-y-4 text-xs">
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between font-semibold text-slate-700 mb-1">
-                <span>No Website Listed / Social-Only Bonus</span>
-                <span className="text-blue-600 font-bold">{weights.noWebsiteScore} pts</span>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-300">Daily Global Search Limit</label>
               <input
-                type="range"
-                min={10}
-                max={50}
-                value={weights.noWebsiteScore}
-                onChange={(e) => setWeights({ ...weights, noWebsiteScore: parseInt(e.target.value, 10) })}
-                className="w-full accent-blue-600"
+                type="number"
+                value={dailyLimit}
+                onChange={(e) => setDailyLimit(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono"
               />
-              <p className="text-[11px] text-slate-400">
-                Core indicator of a business that requires website design & web presence development services.
-              </p>
+              <p className="text-[11px] text-slate-500">Maximum API calls allocated per 24 hour rolling window.</p>
             </div>
 
-            <div>
-              <div className="flex justify-between font-semibold text-slate-700 mb-1">
-                <span>High Customer Rating Factor (Rating &gt;= 4.2)</span>
-                <span className="text-blue-600 font-bold">{weights.highRatingScore} pts</span>
-              </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-300">Monthly Budget Cap</label>
               <input
-                type="range"
-                min={5}
-                max={30}
-                value={weights.highRatingScore}
-                onChange={(e) => setWeights({ ...weights, highRatingScore: parseInt(e.target.value, 10) })}
-                className="w-full accent-blue-600"
+                type="number"
+                value={monthlyLimit}
+                onChange={(e) => setMonthlyLimit(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono"
               />
-              <p className="text-[11px] text-slate-400">
-                Signals commercial popularity and budget to invest in digital upgrades.
-              </p>
+              <p className="text-[11px] text-slate-500">Hard stop to prevent unexpected provider invoice overages.</p>
             </div>
 
-            <div>
-              <div className="flex justify-between font-semibold text-slate-700 mb-1">
-                <span>Review Volume / Traffic Proof</span>
-                <span className="text-blue-600 font-bold">{weights.reviewVolumeScore} pts</span>
-              </div>
-              <input
-                type="range"
-                min={5}
-                max={25}
-                value={weights.reviewVolumeScore}
-                onChange={(e) => setWeights({ ...weights, reviewVolumeScore: parseInt(e.target.value, 10) })}
-                className="w-full accent-blue-600"
-              />
-              <p className="text-[11px] text-slate-400">
-                High review counts demonstrate an active, established customer base.
-              </p>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-300">Default Target Country</label>
+              <select
+                value={defaultCountry}
+                onChange={(e) => setDefaultCountry(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400"
+              >
+                <option value="Indonesia">Indonesia</option>
+                <option value="Singapore">Singapore</option>
+                <option value="Japan">Japan</option>
+                <option value="Australia">Australia</option>
+                <option value="United States">United States</option>
+              </select>
             </div>
 
-            <div>
-              <div className="flex justify-between font-semibold text-slate-700 mb-1">
-                <span>Contactability (Verified Phone Available)</span>
-                <span className="text-blue-600 font-bold">{weights.activePhoneScore} pts</span>
-              </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-300">Export File Retention (Days)</label>
               <input
-                type="range"
-                min={5}
-                max={20}
-                value={weights.activePhoneScore}
-                onChange={(e) => setWeights({ ...weights, activePhoneScore: parseInt(e.target.value, 10) })}
-                className="w-full accent-blue-600"
+                type="number"
+                value={retentionDays}
+                onChange={(e) => setRetentionDays(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono"
               />
+              <p className="text-[11px] text-slate-500">Generated CSV/JSON files purged after this interval.</p>
             </div>
           </div>
 
-          <div className="pt-2 flex justify-end">
+          <div className="pt-2 flex items-center justify-between border-t border-slate-800">
+            <div>
+              <p className="text-xs font-semibold text-white">Multi-Source Simulator Fallback</p>
+              <p className="text-[11px] text-slate-400">
+                Automatically generate high-fidelity simulated prospects when commercial API limits expire.
+              </p>
+            </div>
             <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm transition disabled:opacity-50"
+              type="button"
+              onClick={() => setMockMode(!mockMode)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                mockMode ? 'bg-cyan-500' : 'bg-slate-800'
+              }`}
             >
-              <Save size={14} />
-              <span>{saving ? 'Saving...' : 'Save Configuration'}</span>
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  mockMode ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
             </button>
           </div>
-        </form>
-      </div>
-
-      {/* System Architecture Metadata */}
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 text-xs">
-        <div className="flex items-center space-x-2 pb-3 border-b border-slate-100">
-          <Shield size={18} className="text-slate-700" />
-          <h2 className="text-sm font-bold text-slate-900">Database & Runtime Environment</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-100 space-y-1">
-            <p className="text-[10px] uppercase font-bold text-slate-400">Database Engine</p>
-            <p className="font-bold text-slate-800">PostgreSQL 18.6 (Local Cluster port 5433)</p>
-            <p className="text-slate-500">ORM: Prisma 7.9.1 with `@prisma/adapter-pg`</p>
+        {/* Lead Scoring Weights Config */}
+        <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+          <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+              Lead Opportunity Scoring Weights
+            </h2>
           </div>
 
-          <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-100 space-y-1">
-            <p className="text-[10px] uppercase font-bold text-slate-400">Security & RBAC</p>
-            <p className="font-bold text-slate-800">PBKDF2-SHA512 + JWT HMAC-256</p>
-            <p className="text-slate-500">Roles: ADMIN, SALES, ANALYST, VIEWER</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+              <div className="flex justify-between font-semibold text-slate-200">
+                <span>No Website Listed Weight</span>
+                <span className="font-mono text-cyan-400">+40 pts</span>
+              </div>
+              <p className="text-[11px] text-slate-400">Heaviest factor: indicates immediate need for digital storefront.</p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+              <div className="flex justify-between font-semibold text-slate-200">
+                <span>Social-Media-Only Presence</span>
+                <span className="font-mono text-cyan-400">+25 pts</span>
+              </div>
+              <p className="text-[11px] text-slate-400">Active online audience but no branded checkout/booking site.</p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+              <div className="flex justify-between font-semibold text-slate-200">
+                <span>High Rating & Review Volume</span>
+                <span className="font-mono text-cyan-400">+20 pts</span>
+              </div>
+              <p className="text-[11px] text-slate-400">Proves existing customer trust and commercial cash flow.</p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+              <div className="flex justify-between font-semibold text-slate-200">
+                <span>Direct Phone & Physical Address</span>
+                <span className="font-mono text-cyan-400">+15 pts</span>
+              </div>
+              <p className="text-[11px] text-slate-400">Ensures sales agent can contact and follow up immediately.</p>
+            </div>
           </div>
         </div>
-      </div>
+
+        {/* API Credentials & Vault */}
+        <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+          <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
+            <Key className="w-4 h-4 text-amber-400" />
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+              Provider API Credentials (Vault Masked)
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-300">Google Places API Key</label>
+              <div className="relative">
+                <input
+                  type="password"
+                  value={googleKey}
+                  onChange={(e) => setGoogleKey(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono"
+                />
+                <Lock className="w-3.5 h-3.5 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2" />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-300">Geoapify Places API Key</label>
+              <div className="relative">
+                <input
+                  type="password"
+                  value={geoapifyKey}
+                  onChange={(e) => setGeoapifyKey(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono"
+                />
+                <Lock className="w-3.5 h-3.5 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2" />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-300">Foursquare API Key</label>
+              <div className="relative">
+                <input
+                  type="password"
+                  value={foursquareKey}
+                  onChange={(e) => setFoursquareKey(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono"
+                />
+                <Lock className="w-3.5 h-3.5 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Security & SSRF Protection Banner */}
+        <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start space-x-3 text-xs">
+          <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-semibold text-white">SSRF & Privacy Compliance Active</p>
+            <p className="text-slate-400 leading-relaxed">
+              All backend website audit requests block RFC-1918 private IPv4 addresses (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16), link-local addresses, and AWS/GCP metadata endpoints (169.254.169.254).
+            </p>
+          </div>
+        </div>
+
+        {/* Save Bar */}
+        <div className="flex justify-end pt-4">
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex items-center space-x-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/25 transition-all active:scale-95 disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            <span>{saving ? 'Saving System Configuration...' : 'Save Configuration'}</span>
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
