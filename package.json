@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "pnpm -r --parallel run dev",
-    "build": "pnpm --filter @prospecthunter/database db:generate && pnpm --filter web build",
+    "build": "pnpm --filter @prospecthunter/database db:generate && pnpm -r --filter=!api --filter=!worker --filter=!web run build && pnpm --filter web build",
     "start": "pnpm --filter web start -p 3005",
     "api": "node apps/api/dist/main.js",
     "db:start": "powershell -Command \"& 'C:\\Program Files\\PostgreSQL\\18\\bin\\pg_ctl.exe' -D './data/pgdata' -l './data/postgres.log' -o '-p 5433' start\"",
