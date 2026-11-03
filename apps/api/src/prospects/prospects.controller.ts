@@ -6,6 +6,11 @@ import type { LeadPriority, LeadStatus, UpdateProspectDto } from '@prospecthunte
 export class ProspectsController {
   constructor(private prospectsService: ProspectsService) {}
 
+  @Post()
+  async create(@Body() body: any) {
+    return this.prospectsService.create(body);
+  }
+
   @Get()
   async findAll(
     @Query('page') page?: string,

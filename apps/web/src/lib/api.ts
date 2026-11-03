@@ -423,6 +423,28 @@ export const api = {
     };
   },
 
+  async createProspect(data: {
+    businessName: string;
+    category?: string;
+    city?: string;
+    country?: string;
+    address?: string;
+    phone?: string;
+    websiteUrl?: string;
+    websiteStatus?: string;
+    notes?: string;
+  }): Promise<Prospect> {
+    const res = await fetch(`${API_BASE_URL}/prospects`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error('Gagal menyimpan prospek ke database');
+    }
+    return await res.json();
+  },
+
   async getProspectById(id: string): Promise<Prospect | null> {
     try {
       const res = await fetch(`${API_BASE_URL}/prospects/${id}`, {

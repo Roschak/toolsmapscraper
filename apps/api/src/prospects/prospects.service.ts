@@ -250,6 +250,136 @@ export class ProspectsService {
     };
   }
 
+  async create(data: {
+    businessName: string;
+    category?: string;
+    city?: string;
+    region?: string;
+    country?: string;
+    address?: string;
+    phone?: string;
+    websiteUrl?: string;
+    websiteStatus?: string;
+    notes?: string;
+    leadScore?: number;
+    priority?: LeadPriority;
+  }) {
+    if (!data.businessName || !data.businessName.trim()) {
+      throw new Error('Nama bisnis atau perusahaan wajib diisi');
+    }
+
+    const businessName = data.businessName.trim();
+    const city = data.city?.trim() || 'Jakarta';
+    const country = data.country?.trim() || 'Indonesia';
+    const address = data.address?.trim() || `Jl. Raya ${city}`;
+
+    // 1. Klasifikasi otomatis bidang usaha & cakupan operasional
+    const classification = ClassificationEngine.classify({
+      businessName,
+      rawCategories: data.category ? [data.category] : [],
+      address,
+      city,
+      country,
+      websiteStatus: data.websiteStatus,
+    });
+
+    // 2. Analisis website & peluang prospek
+    const webAnalysis = WebsiteDiscoveryEngine.analyze({
+      rawWebsite: data.websiteUrl,
+      businessName,
+    });
+    const finalWebsiteStatus = (data.websiteStatus as any) || webAnalysis.websiteStatus;
+
+    // 3. Penilaian Lead Score
+    const scoring = LeadScoringEngine.calculate({
+      websiteStatus: finalWebsiteStatus,
+      rating: 4.5,
+      reviewCount: 25,
+      phone: data.phone,
+      address,
+      businessStatus: 'OPERATIONAL',
+    });
+
+    // 4. Pastikan BusinessEntity Terdaftar
+    let businessEntity = await this.prisma.businessEntity.findFirst({
+      where: {
+        canonicalName: {
+          equals: businessName,
+          mode: 'insensitive',
+        },
+      },
+    });
+
+    if (!businessEntity) {
+      businessEntity = await this.prisma.businessEntity.create({
+        data: {
+          canonicalName: businessName,
+          country,
+          region: data.region || 'DKI Jakarta',
+          city,
+          address,
+          phone: data.phone,
+          website: data.websiteUrl || webAnalysis.websiteUrl,
+          categories: data.category ? [data.category] : [classification.subCategory],
+          primaryCategory: classification.subCategory,
+          businessModel: classification.businessModel,
+          businessDescription: classification.businessDescription,
+          operationalSummary: classification.operationalFocus,
+          sourceProviders: ['MANUAL'],
+          dataConfidence: 'USER_PROVIDED',
+        },
+      });
+    }
+
+    // 5. Buat Prospek Otomatis di Database dengan Penjelasan Detail Usaha
+    const tags = ['MANUAL', classification.industry];
+    if (finalWebsiteStatus !== 'WEBSITE_LISTED') tags.push('NO_WEBSITE_OPPORTUNITY');
+    if (scoring.priority === 'HOT') tags.push('HOT_LEAD');
+
+    const prospect = await this.prisma.prospect.create({
+      data: {
+        businessEntityId: businessEntity.id,
+        sourceType: 'MANUAL',
+        businessName,
+        classification: classification.subCategory,
+        classificationConfidence: classification.classificationConfidence,
+        businessModel: classification.businessModel,
+        businessModelConfidence: classification.businessModelConfidence,
+        businessDescription: classification.businessDescription,
+        operationalSummary: classification.operationalFocus,
+        websiteStatus: finalWebsiteStatus,
+        websiteUrl: data.websiteUrl || webAnalysis.websiteUrl,
+        websiteConfidence: webAnalysis.websiteConfidence,
+        phone: data.phone,
+        country,
+        region: data.region || 'DKI Jakarta',
+        city,
+        address,
+        leadScore: data.leadScore || scoring.score,
+        priority: data.priority || scoring.priority,
+        leadStatus: 'NEW',
+        demoStatus: 'NOT_CREATED',
+        notes: data.notes
+          ? `${data.notes}\n\n${classification.businessDescription}`
+          : classification.businessDescription,
+        tags,
+        customFields: {
+          sector: classification.sector,
+          operationalFocus: classification.operationalFocus,
+          operatingLocation: classification.operatingLocation,
+          businessDescription: classification.businessDescription,
+          opportunityExplanation: classification.opportunityExplanation,
+        },
+      },
+      include: {
+        businessEntity: true,
+        leadNotes: true,
+      },
+    });
+
+    return prospect;
+  }
+
   async bulkUpdateStatus(ids: string[], leadStatus: LeadStatus) {
     const result = await this.prisma.prospect.updateMany({
       where: { id: { in: ids } },

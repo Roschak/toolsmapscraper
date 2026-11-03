@@ -60,6 +60,56 @@ function ProspectsContent() {
   const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  // Modal Input Bisnis Baru State
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [submittingAdd, setSubmittingAdd] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [addSuccess, setAddSuccess] = useState<string | null>(null);
+  const [newBusinessForm, setNewBusinessForm] = useState({
+    businessName: '',
+    category: 'Cafe & Kedai Kopi',
+    city: 'Bandung',
+    address: '',
+    phone: '',
+    websiteUrl: '',
+    websiteStatus: 'NO_WEBSITE_LISTED',
+    notes: '',
+  });
+
+  const handleAddBusinessSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBusinessForm.businessName.trim()) {
+      setAddError('Nama bisnis / perusahaan wajib diisi.');
+      return;
+    }
+    setSubmittingAdd(true);
+    setAddError(null);
+    try {
+      const created = await api.createProspect(newBusinessForm);
+      setAddSuccess(`Data bisnis "${created.businessName}" berhasil disimpan ke database!`);
+      await loadProspects();
+      setSelectedProspect(created);
+      setTimeout(() => {
+        setIsAddModalOpen(false);
+        setAddSuccess(null);
+        setNewBusinessForm({
+          businessName: '',
+          category: 'Cafe & Kedai Kopi',
+          city: 'Bandung',
+          address: '',
+          phone: '',
+          websiteUrl: '',
+          websiteStatus: 'NO_WEBSITE_LISTED',
+          notes: '',
+        });
+      }, 1200);
+    } catch (err: any) {
+      setAddError(err.message || 'Gagal menyimpan bisnis ke database');
+    } finally {
+      setSubmittingAdd(false);
+    }
+  };
+
   const loadProspects = async () => {
     setLoading(true);
     try {
@@ -229,8 +279,19 @@ function ProspectsContent() {
           </p>
         </div>
 
-        {/* Export Buttons */}
+        {/* Action Buttons */}
         <div className="flex items-center space-x-2 shrink-0">
+          <button
+            onClick={() => {
+              setIsAddModalOpen(true);
+              setAddError(null);
+              setAddSuccess(null);
+            }}
+            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-xs font-bold text-white transition-all active:scale-95 shadow-md shadow-emerald-500/20"
+          >
+            <Plus className="w-3.5 h-3.5 text-white" />
+            <span>+ Input Bisnis Baru</span>
+          </button>
           <button
             onClick={() => handleExport('CSV')}
             disabled={exporting}
@@ -937,6 +998,164 @@ function ProspectsContent() {
                 Close Drawer
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Modal Input Bisnis Baru (Auto Database Creation) */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 space-y-5 overflow-hidden">
+            {/* Header Modal */}
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    AUTO DATABASE CREATION
+                  </span>
+                  <span className="text-[11px] text-slate-400">Tersimpan Langsung ke Supabase</span>
+                </div>
+                <h3 className="text-lg font-bold text-white mt-1">Input Bisnis Baru Manual</h3>
+                <p className="text-xs text-slate-400">
+                  Data otomatis diklasifikasikan bidang usaha, fokus operasional, dan lokasi operasionalnya.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {addSuccess && (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center space-x-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{addSuccess}</span>
+              </div>
+            )}
+
+            {addError && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold flex items-center space-x-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{addError}</span>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleAddBusinessSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Nama Bisnis / Perusahaan <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Kopi Kenangan / PT Solusi Digital"
+                  value={newBusinessForm.businessName}
+                  onChange={(e) => setNewBusinessForm({ ...newBusinessForm, businessName: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-xs text-white placeholder-slate-500 transition-all"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Kategori / Bidang</label>
+                  <select
+                    value={newBusinessForm.category}
+                    onChange={(e) => setNewBusinessForm({ ...newBusinessForm, category: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-500 text-xs text-white transition-all"
+                  >
+                    <option value="Cafe & Kedai Kopi">Cafe & Kedai Kopi</option>
+                    <option value="Restoran & Kuliner">Restoran & Kuliner</option>
+                    <option value="Klinik Gigi & Kesehatan">Klinik Gigi & Kesehatan</option>
+                    <option value="Distro & Toko Pakaian">Distro & Toko Pakaian</option>
+                    <option value="Bengkel & Auto Detailing">Bengkel & Auto Detailing</option>
+                    <option value="Agensi Digital & IT Solution">Agensi Digital & IT Solution</option>
+                    <option value="Kantor Hukum & Konsultan">Kantor Hukum & Konsultan</option>
+                    <option value="Hotel & Villa Wisata">Hotel & Villa Wisata</option>
+                    <option value="Lainnya">Lainnya / Umum</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Kota</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Bandung"
+                    value={newBusinessForm.city}
+                    onChange={(e) => setNewBusinessForm({ ...newBusinessForm, city: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-500 text-xs text-white placeholder-slate-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Alamat Lengkap</label>
+                <input
+                  type="text"
+                  placeholder="Contoh: Jl. Riau No. 12, Citarum"
+                  value={newBusinessForm.address}
+                  onChange={(e) => setNewBusinessForm({ ...newBusinessForm, address: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-500 text-xs text-white placeholder-slate-500 transition-all"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Status Website</label>
+                  <select
+                    value={newBusinessForm.websiteStatus}
+                    onChange={(e) => setNewBusinessForm({ ...newBusinessForm, websiteStatus: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-500 text-xs text-white transition-all"
+                  >
+                    <option value="NO_WEBSITE_LISTED">Belum Punya Website (Peluang Utama)</option>
+                    <option value="SOCIAL_ONLY">Hanya Medsos (Instagram/TikTok)</option>
+                    <option value="WEBSITE_LISTED">Sudah Ada Website</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Telepon / WhatsApp</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: 08123456789"
+                    value={newBusinessForm.phone}
+                    onChange={(e) => setNewBusinessForm({ ...newBusinessForm, phone: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-500 text-xs text-white placeholder-slate-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Catatan Tambahan (Opsional)</label>
+                <textarea
+                  rows={2}
+                  placeholder="Catatan khusus atau keunikan bisnis..."
+                  value={newBusinessForm.notes}
+                  onChange={(e) => setNewBusinessForm({ ...newBusinessForm, notes: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-500 text-xs text-white placeholder-slate-500 transition-all resize-none"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingAdd}
+                  className="flex items-center space-x-1.5 px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-xs font-bold text-white transition-all active:scale-95 shadow-md shadow-emerald-500/20 disabled:opacity-50"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-white" />
+                  <span>{submittingAdd ? 'Menyimpan ke Supabase...' : 'Simpan & Buat Otomatis'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
