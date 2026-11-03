@@ -78,6 +78,7 @@ enum SourceType {
   FOURSQUARE
   OVERTURE
   GEOAPIFY
+  OPEN_STREET_MAP
   USER_IMPORT
   MANUAL
   MOCK_PROVIDER
@@ -129,6 +130,8 @@ model BusinessEntity {
   categories      String[]
   primaryCategory String?
   businessModel   String?
+  businessDescription String?
+  operationalSummary String?
   legalEntity     String?
   phone           String?
   website         String?
@@ -159,6 +162,8 @@ model Prospect {
   classificationConfidence Float?
   businessModel            String?
   businessModelConfidence  Float?
+  businessDescription      String?
+  operationalSummary       String?
   websiteStatus            WebsiteStatus  @default(NO_WEBSITE_LISTED)
   websiteUrl               String?
   websiteConfidence        Float?

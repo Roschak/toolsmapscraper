@@ -85,6 +85,8 @@ export class WorkerService implements OnModuleInit, OnModuleDestroy {
               categories: candidate.raw.categories,
               primaryCategory: candidate.classification,
               businessModel: candidate.businessModel,
+              businessDescription: candidate.businessDescription,
+              operationalSummary: candidate.operationalSummary,
               phone: candidate.phone,
               website: candidate.websiteUrl,
               rating: candidate.rating,
@@ -105,6 +107,8 @@ export class WorkerService implements OnModuleInit, OnModuleDestroy {
             classification: candidate.classification,
             classificationConfidence: candidate.classificationConfidence,
             businessModel: candidate.businessModel,
+              businessDescription: candidate.businessDescription,
+              operationalSummary: candidate.operationalSummary,
             businessModelConfidence: candidate.businessModelConfidence,
             websiteStatus: candidate.websiteStatus,
             websiteUrl: candidate.websiteUrl,
@@ -124,6 +128,7 @@ export class WorkerService implements OnModuleInit, OnModuleDestroy {
             leadStatus: 'NEW',
             notes: candidate.notes,
             tags: candidate.tags,
+            customFields: candidate.customFields,
           },
         });
         saved++;

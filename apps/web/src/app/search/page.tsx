@@ -164,7 +164,7 @@ function SearchDiscoveryContent() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
           {/* Target City */}
           <div className="space-y-1.5">
             <label className="font-semibold text-slate-300">Target City / Hub</label>
@@ -202,6 +202,22 @@ function SearchDiscoveryContent() {
               className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 font-medium"
               required
             />
+          </div>
+
+          {/* Provider Engine */}
+          <div className="space-y-1.5">
+            <label className="font-semibold text-slate-300">Data Source</label>
+            <select
+              value={provider}
+              onChange={(e) => setProvider(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-cyan-400 font-medium cursor-pointer"
+            >
+              <option value="ALL">Auto (Best Available)</option>
+              <option value="OPEN_STREET_MAP">OpenStreetMap (Live Real - Free)</option>
+              <option value="MOCK_PROVIDER">Simulator Engine</option>
+              <option value="GOOGLE_PLACES">Google Places API</option>
+              <option value="GEOAPIFY">Geoapify API</option>
+            </select>
           </div>
 
           {/* Discovery Limit */}

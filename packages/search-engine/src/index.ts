@@ -13,6 +13,8 @@ export interface EnrichedProspectCandidate {
   classificationConfidence: number;
   businessModel: string;
   businessModelConfidence: number;
+  businessDescription: string;
+  operationalSummary: string;
   websiteStatus: any;
   websiteUrl?: string;
   websiteConfidence: number;
@@ -31,6 +33,7 @@ export interface EnrichedProspectCandidate {
   leadStatus: any;
   notes?: string;
   tags: string[];
+  customFields?: any;
 }
 
 export class SearchEngine {
@@ -38,8 +41,8 @@ export class SearchEngine {
    * Execute search across providers and run complete pipeline:
    * 1. Multi-provider dispatch
    * 2. Within-batch entity deduplication
-   * 3. Industry & business model classification
-   * 4. Website presence & opportunity discovery
+   * 3. Website presence & opportunity discovery
+   * 4. Industry & detailed operational classification & business description
    * 5. Commercial lead scoring & priority assignment
    */
   static async searchAndEnrich(
@@ -73,14 +76,11 @@ export class SearchEngine {
       }
     }
 
-    // 2. Enrich each record through classification, website discovery, and scoring
+    // 2. Enrich each record through website discovery, classification, and scoring
     let websiteOpportunityCount = 0;
     const candidates: EnrichedProspectCandidate[] = [];
 
     for (const record of uniqueRecords) {
-      // Classification
-      const classification = ClassificationEngine.classify(record.businessName, record.categories);
-
       // Website Discovery
       const webAnalysis = WebsiteDiscoveryEngine.analyze({
         rawWebsite: record.website,
@@ -91,6 +91,17 @@ export class SearchEngine {
       if (webAnalysis.isOpportunity) {
         websiteOpportunityCount++;
       }
+
+      // Classification & Operational Explanation
+      const classification = ClassificationEngine.classify({
+        businessName: record.businessName,
+        rawCategories: record.categories,
+        address: record.address,
+        city: record.city || params.city,
+        region: record.region || params.region,
+        country: record.country || params.country,
+        websiteStatus: webAnalysis.websiteStatus,
+      });
 
       // Lead Scoring
       const scoring = LeadScoringEngine.calculate({
@@ -103,6 +114,9 @@ export class SearchEngine {
       });
 
       const tags: string[] = [classification.industry];
+      if (classification.sector) {
+        tags.push(classification.subCategory);
+      }
       if (webAnalysis.isOpportunity) {
         tags.push('NO_WEBSITE_OPPORTUNITY');
       }
@@ -118,6 +132,8 @@ export class SearchEngine {
         classificationConfidence: classification.classificationConfidence,
         businessModel: classification.businessModel,
         businessModelConfidence: classification.businessModelConfidence,
+        businessDescription: classification.businessDescription,
+        operationalSummary: classification.operationalFocus,
         websiteStatus: webAnalysis.websiteStatus,
         websiteUrl: webAnalysis.websiteUrl,
         websiteConfidence: webAnalysis.websiteConfidence,
@@ -134,8 +150,15 @@ export class SearchEngine {
         leadScore: scoring.score,
         priority: scoring.priority,
         leadStatus: 'NEW',
-        notes: webAnalysis.notes,
+        notes: classification.businessDescription,
         tags,
+        customFields: {
+          sector: classification.sector,
+          operationalFocus: classification.operationalFocus,
+          operatingLocation: classification.operatingLocation,
+          businessDescription: classification.businessDescription,
+          opportunityExplanation: classification.opportunityExplanation,
+        },
       });
     }
 
@@ -148,5 +171,5 @@ export class SearchEngine {
   }
 }
 
-// Runtime value for interface
+// Runtime values
 export const EnrichedProspectCandidate = {};

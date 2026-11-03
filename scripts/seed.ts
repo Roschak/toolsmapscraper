@@ -2,6 +2,7 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../packages/database/src/generated/client/index.js';
 import { SearchEngine } from '../packages/search-engine/src/index.ts';
+import { ClassificationEngine } from '../packages/classification/src/index.ts';
 
 const connectionString =
   process.env.DATABASE_URL ||
@@ -48,6 +49,48 @@ async function seed() {
     }
     console.log('Default settings seeded.');
   }
+
+    // Update any existing prospects with detailed business descriptions
+  const unEnriched = await prisma.prospect.findMany();
+  console.log(`Auditing and enriching ${unEnriched.length} existing prospects...`);
+  for (const p of unEnriched) {
+    const classification = ClassificationEngine.classify({
+      businessName: p.businessName,
+      rawCategories: p.tags || [p.classification || 'Commercial Entity'],
+      address: p.address || undefined,
+      city: p.city || undefined,
+      region: p.region || undefined,
+      country: p.country || undefined,
+      websiteStatus: p.websiteStatus,
+    });
+
+    await prisma.prospect.update({
+      where: { id: p.id },
+      data: {
+        businessDescription: classification.businessDescription,
+        operationalSummary: classification.operationalFocus,
+        notes: classification.businessDescription,
+        customFields: {
+          sector: classification.sector,
+          operationalFocus: classification.operationalFocus,
+          operatingLocation: classification.operatingLocation,
+          businessDescription: classification.businessDescription,
+          opportunityExplanation: classification.opportunityExplanation,
+        },
+      },
+    });
+
+    if (p.businessEntityId) {
+      await prisma.businessEntity.update({
+        where: { id: p.businessEntityId },
+        data: {
+          businessDescription: classification.businessDescription,
+          operationalSummary: classification.operationalFocus,
+        },
+      }).catch(() => {});
+    }
+  }
+  console.log('All prospects successfully enriched with business descriptions & operational scope!');
 
   // Check if prospects already exist
   const count = await prisma.prospect.count();
@@ -108,6 +151,8 @@ async function seed() {
               categories: candidate.raw.categories,
               primaryCategory: candidate.classification,
               businessModel: candidate.businessModel,
+              businessDescription: candidate.businessDescription,
+              operationalSummary: candidate.operationalSummary,
               phone: candidate.phone,
               website: candidate.websiteUrl,
               rating: candidate.rating,
@@ -128,6 +173,8 @@ async function seed() {
             classification: candidate.classification,
             classificationConfidence: candidate.classificationConfidence,
             businessModel: candidate.businessModel,
+              businessDescription: candidate.businessDescription,
+              operationalSummary: candidate.operationalSummary,
             businessModelConfidence: candidate.businessModelConfidence,
             websiteStatus: candidate.websiteStatus,
             websiteUrl: candidate.websiteUrl,
@@ -147,6 +194,7 @@ async function seed() {
             leadStatus: candidate.priority === 'HOT' ? 'RESEARCHED' : 'NEW',
             notes: candidate.notes,
             tags: candidate.tags,
+            customFields: candidate.customFields,
           },
         });
 

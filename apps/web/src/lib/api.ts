@@ -8,6 +8,9 @@ export interface Prospect {
   classificationConfidence?: number;
   businessModel?: string;
   businessModelConfidence?: number;
+  businessDescription?: string;
+  operationalSummary?: string;
+  customFields?: any;
   websiteStatus: 'NO_WEBSITE_LISTED' | 'SOCIAL_ONLY' | 'WEBSITE_LISTED' | 'POSSIBLE_WEBSITE' | 'WEBSITE_UNCERTAIN';
   websiteUrl?: string;
   websiteConfidence?: number;
@@ -87,7 +90,13 @@ export interface DashboardStats {
   recentJobs: SearchJob[];
 }
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+export const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== 'undefined'
+    ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:4000/api'
+        : '/api')
+    : 'http://localhost:4000/api');
 export const API_BASE_URL = API_BASE;
 
 export function getAuthToken(): string | null {
@@ -243,19 +252,21 @@ export const api = {
     totalPages: number;
   }> {
     try {
-      const url = new URL(`${API_BASE_URL}/prospects`);
-      if (params.query) url.searchParams.set('query', params.query);
-      if (params.city) url.searchParams.set('city', params.city);
-      if (params.category) url.searchParams.set('category', params.category);
-      if (params.priority) url.searchParams.set('priority', params.priority);
-      if (params.leadStatus) url.searchParams.set('leadStatus', params.leadStatus);
-      if (params.websiteOpportunityOnly) url.searchParams.set('websiteOpportunityOnly', 'true');
-      if (params.page) url.searchParams.set('page', String(params.page));
-      if (params.pageSize) url.searchParams.set('pageSize', String(params.pageSize));
-      if (params.sortBy) url.searchParams.set('sortBy', params.sortBy);
-      if (params.sortOrder) url.searchParams.set('sortOrder', params.sortOrder);
+      const searchParams = new URLSearchParams();
+      if (params.query) searchParams.set('query', params.query);
+      if (params.city) searchParams.set('city', params.city);
+      if (params.category) searchParams.set('category', params.category);
+      if (params.priority) searchParams.set('priority', params.priority);
+      if (params.leadStatus) searchParams.set('leadStatus', params.leadStatus);
+      if (params.websiteOpportunityOnly) searchParams.set('websiteOpportunityOnly', 'true');
+      if (params.page) searchParams.set('page', String(params.page));
+      if (params.pageSize) searchParams.set('pageSize', String(params.pageSize));
+      if (params.sortBy) searchParams.set('sortBy', params.sortBy);
+      if (params.sortOrder) searchParams.set('sortOrder', params.sortOrder);
 
-      const res = await fetch(url.toString(), {
+      const qs = searchParams.toString();
+      const endpoint = `${API_BASE_URL}/prospects${qs ? `?${qs}` : ''}`;
+      const res = await fetch(endpoint, {
         cache: 'no-store',
         headers: getAuthHeaders(),
       });
@@ -266,9 +277,146 @@ export const api = {
       console.warn('API getProspects unreachable, returning fallback mock set', err);
     }
 
+    const sampleProspects: Prospect[] = [
+      {
+        id: 'mock_p1',
+        sourceType: 'OPEN_STREET_MAP',
+        businessName: 'Kurnia Kafe & Roastery',
+        classification: 'Kuliner & Kedai Kopi (Food & Beverage)',
+        businessModel: 'B2C',
+        businessDescription: 'Kurnia Kafe & Roastery bergerak di bidang Kuliner, Restoran & Kafe / Kedai Kopi dengan model operasional B2C di Bandung, Jawa Barat (Jl. Riau No. 12). Menyajikan racikan kopi spesialti, aneka minuman santai, dan makanan ringan. Belum memiliki website resmi.',
+        operationalSummary: 'Penyediaan aneka racikan kopi spesialti, aneka minuman santai, dan hidangan makanan dengan konsep dine-in maupun takeaway.',
+        websiteStatus: 'NO_WEBSITE_LISTED',
+        phone: '+62 812-3456-7890',
+        city: 'Bandung',
+        country: 'Indonesia',
+        address: 'Jl. Riau No. 12, Bandung',
+        leadScore: 92,
+        priority: 'HOT',
+        leadStatus: 'NEW',
+        rating: 4.8,
+        reviewCount: 165,
+        tags: ['Food & Hospitality', 'NO_WEBSITE_OPPORTUNITY', 'HOT_LEAD'],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        customFields: {
+          sector: 'Kuliner, Restoran & Kafe / Kedai Kopi',
+          operationalFocus: 'Penyediaan aneka racikan kopi spesialti dan hidangan makanan ringan.',
+          operatingLocation: 'Beroperasi di Bandung, Jawa Barat, Indonesia (Jl. Riau No. 12)',
+        },
+      },
+      {
+        id: 'mock_p2',
+        sourceType: 'MOCK_PROVIDER',
+        businessName: 'Sentosa Legal & Tax Partners',
+        classification: 'Jasa Profesional & Konsultan Hukum (Legal & Advisory)',
+        businessModel: 'B2B',
+        businessDescription: 'Sentosa Legal & Tax Partners bergerak di bidang Layanan Hukum, Konsultasi Bisnis & Perpajakan dengan model operasional B2B di Jakarta Selatan (Jl. Sudirman No. 45). Menyediakan layanan advokasi hukum korporasi dan konsultasi pajak.',
+        operationalSummary: 'Penyediaan jasa advokasi hukum korporasi, konsultasi perpajakan, audit akuntansi publik, dan pengurusan legalitas notariat untuk entitas bisnis.',
+        websiteStatus: 'SOCIAL_ONLY',
+        phone: '+62 21 555-4321',
+        city: 'Jakarta',
+        country: 'Indonesia',
+        address: 'Jl. Sudirman No. 45, Jakarta Selatan',
+        leadScore: 88,
+        priority: 'HOT',
+        leadStatus: 'RESEARCHED',
+        rating: 4.9,
+        reviewCount: 84,
+        tags: ['Professional Services', 'HOT_LEAD'],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        customFields: {
+          sector: 'Layanan Hukum, Konsultasi Bisnis & Perpajakan',
+          operationalFocus: 'Konsultasi hukum korporat dan audit perpajakan perusahaan.',
+          operatingLocation: 'Beroperasi di Jakarta Selatan, DKI Jakarta, Indonesia (Jl. Sudirman No. 45)',
+        },
+      },
+      {
+        id: 'mock_p3',
+        sourceType: 'OPEN_STREET_MAP',
+        businessName: 'Prima Dental Aesthetic Clinic',
+        classification: 'Layanan Kesehatan & Klinik (Healthcare & Dental)',
+        businessModel: 'B2C',
+        businessDescription: 'Prima Dental Aesthetic Clinic bergerak di bidang Kesehatan, Perawatan Gigi & Klinik Medis dengan model operasional B2C di Surabaya, Jawa Timur (Jl. Darmo No. 88). Melayani perawatan estetika gigi dan ortodonti.',
+        operationalSummary: 'Layanan konsultasi medis, pemeriksaan kesehatan, perawatan gigi profesional, estetika mulut, dan terapi pengobatan klinis.',
+        websiteStatus: 'NO_WEBSITE_LISTED',
+        phone: '+62 31 888-9999',
+        city: 'Surabaya',
+        country: 'Indonesia',
+        address: 'Jl. Darmo No. 88, Surabaya',
+        leadScore: 85,
+        priority: 'HOT',
+        leadStatus: 'DEMO_READY',
+        rating: 4.7,
+        reviewCount: 110,
+        tags: ['Healthcare & Wellness', 'NO_WEBSITE_OPPORTUNITY'],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: 'mock_p4',
+        sourceType: 'MOCK_PROVIDER',
+        businessName: 'Nexus Tech Creative Studio',
+        classification: 'Teknologi Informasi & Agensi Digital (IT & Digital Services)',
+        businessModel: 'B2B',
+        businessDescription: 'Nexus Tech Creative Studio bergerak di bidang Pengembangan Perangkat Lunak, IT Solutions & Digital Agency dengan model operasional B2B di Jakarta Pusat. Menyediakan jasa pembuatan aplikasi dan transformasi digital.',
+        operationalSummary: 'Pengembangan perangkat lunak, solusi cloud, transformasi digital enterprise, keamanan siber, dan penyediaan jasa pemasaran digital.',
+        websiteStatus: 'WEBSITE_LISTED',
+        websiteUrl: 'https://www.nexustech.io',
+        phone: '+62 21 777-6655',
+        city: 'Jakarta',
+        country: 'Indonesia',
+        address: 'Jl. Thamrin No. 10, Jakarta Pusat',
+        leadScore: 65,
+        priority: 'MEDIUM',
+        leadStatus: 'CONTACTED',
+        rating: 4.6,
+        reviewCount: 45,
+        tags: ['Technology & Software'],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: 'mock_p5',
+        sourceType: 'OPEN_STREET_MAP',
+        businessName: 'Bintang Auto Detailing & Workshop',
+        classification: 'Otomotif & Bengkel Kendaraan (Automotive Services)',
+        businessModel: 'B2C',
+        businessDescription: 'Bintang Auto Detailing bergerak di bidang Perawatan Berkala, Servis Mesin & Perbaikan Kendaraan dengan model operasional B2C di Bogor, Jawa Barat. Menyediakan layanan salon mobil, coating, dan servis mesin.',
+        operationalSummary: 'Layanan pemeliharaan mesin kendaraan, ganti oli dan suku cadang, serta perawatan bodi kendaraan (auto detailing).',
+        websiteStatus: 'NO_WEBSITE_LISTED',
+        phone: '+62 251 333-2211',
+        city: 'Bogor',
+        country: 'Indonesia',
+        address: 'Jl. Pajajaran No. 24, Bogor',
+        leadScore: 82,
+        priority: 'HIGH',
+        leadStatus: 'NEW',
+        rating: 4.5,
+        reviewCount: 95,
+        tags: ['Automotive & Transport', 'NO_WEBSITE_OPPORTUNITY'],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ];
+
+    let filtered = sampleProspects;
+    if (params.city) {
+      filtered = filtered.filter((p) => p.city?.toLowerCase().includes(params.city!.toLowerCase()));
+    }
+    if (params.query) {
+      const q = params.query.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.businessName.toLowerCase().includes(q) ||
+          p.city?.toLowerCase().includes(q) ||
+          p.classification?.toLowerCase().includes(q)
+      );
+    }
     return {
-      items: [],
-      total: 0,
+      items: filtered,
+      total: filtered.length,
       page: 1,
       pageSize: 20,
       totalPages: 1,

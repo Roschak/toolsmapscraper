@@ -150,6 +150,7 @@ export const SourceType: {
   FOURSQUARE: 'FOURSQUARE',
   OVERTURE: 'OVERTURE',
   GEOAPIFY: 'GEOAPIFY',
+  OPEN_STREET_MAP: 'OPEN_STREET_MAP',
   USER_IMPORT: 'USER_IMPORT',
   MANUAL: 'MANUAL',
   MOCK_PROVIDER: 'MOCK_PROVIDER',
@@ -5048,6 +5049,8 @@ export namespace Prisma {
     longitude: number | null
     primaryCategory: string | null
     businessModel: string | null
+    businessDescription: string | null
+    operationalSummary: string | null
     legalEntity: string | null
     phone: string | null
     website: string | null
@@ -5072,6 +5075,8 @@ export namespace Prisma {
     longitude: number | null
     primaryCategory: string | null
     businessModel: string | null
+    businessDescription: string | null
+    operationalSummary: string | null
     legalEntity: string | null
     phone: string | null
     website: string | null
@@ -5098,6 +5103,8 @@ export namespace Prisma {
     categories: number
     primaryCategory: number
     businessModel: number
+    businessDescription: number
+    operationalSummary: number
     legalEntity: number
     phone: number
     website: number
@@ -5140,6 +5147,8 @@ export namespace Prisma {
     longitude?: true
     primaryCategory?: true
     businessModel?: true
+    businessDescription?: true
+    operationalSummary?: true
     legalEntity?: true
     phone?: true
     website?: true
@@ -5164,6 +5173,8 @@ export namespace Prisma {
     longitude?: true
     primaryCategory?: true
     businessModel?: true
+    businessDescription?: true
+    operationalSummary?: true
     legalEntity?: true
     phone?: true
     website?: true
@@ -5190,6 +5201,8 @@ export namespace Prisma {
     categories?: true
     primaryCategory?: true
     businessModel?: true
+    businessDescription?: true
+    operationalSummary?: true
     legalEntity?: true
     phone?: true
     website?: true
@@ -5305,6 +5318,8 @@ export namespace Prisma {
     categories: string[]
     primaryCategory: string | null
     businessModel: string | null
+    businessDescription: string | null
+    operationalSummary: string | null
     legalEntity: string | null
     phone: string | null
     website: string | null
@@ -5352,6 +5367,8 @@ export namespace Prisma {
     categories?: boolean
     primaryCategory?: boolean
     businessModel?: boolean
+    businessDescription?: boolean
+    operationalSummary?: boolean
     legalEntity?: boolean
     phone?: boolean
     website?: boolean
@@ -5382,6 +5399,8 @@ export namespace Prisma {
     categories?: boolean
     primaryCategory?: boolean
     businessModel?: boolean
+    businessDescription?: boolean
+    operationalSummary?: boolean
     legalEntity?: boolean
     phone?: boolean
     website?: boolean
@@ -5410,6 +5429,8 @@ export namespace Prisma {
     categories?: boolean
     primaryCategory?: boolean
     businessModel?: boolean
+    businessDescription?: boolean
+    operationalSummary?: boolean
     legalEntity?: boolean
     phone?: boolean
     website?: boolean
@@ -5438,6 +5459,8 @@ export namespace Prisma {
     categories?: boolean
     primaryCategory?: boolean
     businessModel?: boolean
+    businessDescription?: boolean
+    operationalSummary?: boolean
     legalEntity?: boolean
     phone?: boolean
     website?: boolean
@@ -5452,7 +5475,7 @@ export namespace Prisma {
     lastVerifiedAt?: boolean
   }
 
-  export type BusinessEntityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "canonicalName" | "providerIds" | "country" | "region" | "city" | "district" | "address" | "latitude" | "longitude" | "categories" | "primaryCategory" | "businessModel" | "legalEntity" | "phone" | "website" | "socialLinks" | "rating" | "reviewCount" | "businessStatus" | "sourceProviders" | "dataConfidence" | "createdAt" | "updatedAt" | "lastVerifiedAt", ExtArgs["result"]["businessEntity"]>
+  export type BusinessEntityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "canonicalName" | "providerIds" | "country" | "region" | "city" | "district" | "address" | "latitude" | "longitude" | "categories" | "primaryCategory" | "businessModel" | "businessDescription" | "operationalSummary" | "legalEntity" | "phone" | "website" | "socialLinks" | "rating" | "reviewCount" | "businessStatus" | "sourceProviders" | "dataConfidence" | "createdAt" | "updatedAt" | "lastVerifiedAt", ExtArgs["result"]["businessEntity"]>
   export type BusinessEntityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     prospects?: boolean | BusinessEntity$prospectsArgs<ExtArgs>
     _count?: boolean | BusinessEntityCountOutputTypeDefaultArgs<ExtArgs>
@@ -5479,6 +5502,8 @@ export namespace Prisma {
       categories: string[]
       primaryCategory: string | null
       businessModel: string | null
+      businessDescription: string | null
+      operationalSummary: string | null
       legalEntity: string | null
       phone: string | null
       website: string | null
@@ -5928,6 +5953,8 @@ export namespace Prisma {
     readonly categories: FieldRef<"BusinessEntity", 'String[]'>
     readonly primaryCategory: FieldRef<"BusinessEntity", 'String'>
     readonly businessModel: FieldRef<"BusinessEntity", 'String'>
+    readonly businessDescription: FieldRef<"BusinessEntity", 'String'>
+    readonly operationalSummary: FieldRef<"BusinessEntity", 'String'>
     readonly legalEntity: FieldRef<"BusinessEntity", 'String'>
     readonly phone: FieldRef<"BusinessEntity", 'String'>
     readonly website: FieldRef<"BusinessEntity", 'String'>
@@ -6419,6 +6446,8 @@ export namespace Prisma {
     classificationConfidence: number | null
     businessModel: string | null
     businessModelConfidence: number | null
+    businessDescription: string | null
+    operationalSummary: string | null
     websiteStatus: $Enums.WebsiteStatus | null
     websiteUrl: string | null
     websiteConfidence: number | null
@@ -6454,6 +6483,8 @@ export namespace Prisma {
     classificationConfidence: number | null
     businessModel: string | null
     businessModelConfidence: number | null
+    businessDescription: string | null
+    operationalSummary: string | null
     websiteStatus: $Enums.WebsiteStatus | null
     websiteUrl: string | null
     websiteConfidence: number | null
@@ -6489,6 +6520,8 @@ export namespace Prisma {
     classificationConfidence: number
     businessModel: number
     businessModelConfidence: number
+    businessDescription: number
+    operationalSummary: number
     websiteStatus: number
     websiteUrl: number
     websiteConfidence: number
@@ -6550,6 +6583,8 @@ export namespace Prisma {
     classificationConfidence?: true
     businessModel?: true
     businessModelConfidence?: true
+    businessDescription?: true
+    operationalSummary?: true
     websiteStatus?: true
     websiteUrl?: true
     websiteConfidence?: true
@@ -6585,6 +6620,8 @@ export namespace Prisma {
     classificationConfidence?: true
     businessModel?: true
     businessModelConfidence?: true
+    businessDescription?: true
+    operationalSummary?: true
     websiteStatus?: true
     websiteUrl?: true
     websiteConfidence?: true
@@ -6620,6 +6657,8 @@ export namespace Prisma {
     classificationConfidence?: true
     businessModel?: true
     businessModelConfidence?: true
+    businessDescription?: true
+    operationalSummary?: true
     websiteStatus?: true
     websiteUrl?: true
     websiteConfidence?: true
@@ -6744,6 +6783,8 @@ export namespace Prisma {
     classificationConfidence: number | null
     businessModel: string | null
     businessModelConfidence: number | null
+    businessDescription: string | null
+    operationalSummary: string | null
     websiteStatus: $Enums.WebsiteStatus
     websiteUrl: string | null
     websiteConfidence: number | null
@@ -6800,6 +6841,8 @@ export namespace Prisma {
     classificationConfidence?: boolean
     businessModel?: boolean
     businessModelConfidence?: boolean
+    businessDescription?: boolean
+    operationalSummary?: boolean
     websiteStatus?: boolean
     websiteUrl?: boolean
     websiteConfidence?: boolean
@@ -6841,6 +6884,8 @@ export namespace Prisma {
     classificationConfidence?: boolean
     businessModel?: boolean
     businessModelConfidence?: boolean
+    businessDescription?: boolean
+    operationalSummary?: boolean
     websiteStatus?: boolean
     websiteUrl?: boolean
     websiteConfidence?: boolean
@@ -6880,6 +6925,8 @@ export namespace Prisma {
     classificationConfidence?: boolean
     businessModel?: boolean
     businessModelConfidence?: boolean
+    businessDescription?: boolean
+    operationalSummary?: boolean
     websiteStatus?: boolean
     websiteUrl?: boolean
     websiteConfidence?: boolean
@@ -6919,6 +6966,8 @@ export namespace Prisma {
     classificationConfidence?: boolean
     businessModel?: boolean
     businessModelConfidence?: boolean
+    businessDescription?: boolean
+    operationalSummary?: boolean
     websiteStatus?: boolean
     websiteUrl?: boolean
     websiteConfidence?: boolean
@@ -6946,7 +6995,7 @@ export namespace Prisma {
     lastVerifiedAt?: boolean
   }
 
-  export type ProspectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "businessEntityId" | "searchJobId" | "sourceType" | "businessName" | "classification" | "classificationConfidence" | "businessModel" | "businessModelConfidence" | "websiteStatus" | "websiteUrl" | "websiteConfidence" | "phone" | "country" | "region" | "city" | "address" | "latitude" | "longitude" | "rating" | "reviewCount" | "businessStatus" | "leadScore" | "priority" | "leadStatus" | "demoStatus" | "demoUrl" | "notes" | "assignedTo" | "tags" | "customFields" | "createdAt" | "updatedAt" | "lastVerifiedAt", ExtArgs["result"]["prospect"]>
+  export type ProspectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "businessEntityId" | "searchJobId" | "sourceType" | "businessName" | "classification" | "classificationConfidence" | "businessModel" | "businessModelConfidence" | "businessDescription" | "operationalSummary" | "websiteStatus" | "websiteUrl" | "websiteConfidence" | "phone" | "country" | "region" | "city" | "address" | "latitude" | "longitude" | "rating" | "reviewCount" | "businessStatus" | "leadScore" | "priority" | "leadStatus" | "demoStatus" | "demoUrl" | "notes" | "assignedTo" | "tags" | "customFields" | "createdAt" | "updatedAt" | "lastVerifiedAt", ExtArgs["result"]["prospect"]>
   export type ProspectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     businessEntity?: boolean | Prospect$businessEntityArgs<ExtArgs>
     searchJob?: boolean | Prospect$searchJobArgs<ExtArgs>
@@ -6979,6 +7028,8 @@ export namespace Prisma {
       classificationConfidence: number | null
       businessModel: string | null
       businessModelConfidence: number | null
+      businessDescription: string | null
+      operationalSummary: string | null
       websiteStatus: $Enums.WebsiteStatus
       websiteUrl: string | null
       websiteConfidence: number | null
@@ -7439,6 +7490,8 @@ export namespace Prisma {
     readonly classificationConfidence: FieldRef<"Prospect", 'Float'>
     readonly businessModel: FieldRef<"Prospect", 'String'>
     readonly businessModelConfidence: FieldRef<"Prospect", 'Float'>
+    readonly businessDescription: FieldRef<"Prospect", 'String'>
+    readonly operationalSummary: FieldRef<"Prospect", 'String'>
     readonly websiteStatus: FieldRef<"Prospect", 'WebsiteStatus'>
     readonly websiteUrl: FieldRef<"Prospect", 'String'>
     readonly websiteConfidence: FieldRef<"Prospect", 'Float'>
@@ -11553,6 +11606,8 @@ export namespace Prisma {
     categories: 'categories',
     primaryCategory: 'primaryCategory',
     businessModel: 'businessModel',
+    businessDescription: 'businessDescription',
+    operationalSummary: 'operationalSummary',
     legalEntity: 'legalEntity',
     phone: 'phone',
     website: 'website',
@@ -11580,6 +11635,8 @@ export namespace Prisma {
     classificationConfidence: 'classificationConfidence',
     businessModel: 'businessModel',
     businessModelConfidence: 'businessModelConfidence',
+    businessDescription: 'businessDescription',
+    operationalSummary: 'operationalSummary',
     websiteStatus: 'websiteStatus',
     websiteUrl: 'websiteUrl',
     websiteConfidence: 'websiteConfidence',
@@ -12095,6 +12152,8 @@ export namespace Prisma {
     categories?: StringNullableListFilter<"BusinessEntity">
     primaryCategory?: StringNullableFilter<"BusinessEntity"> | string | null
     businessModel?: StringNullableFilter<"BusinessEntity"> | string | null
+    businessDescription?: StringNullableFilter<"BusinessEntity"> | string | null
+    operationalSummary?: StringNullableFilter<"BusinessEntity"> | string | null
     legalEntity?: StringNullableFilter<"BusinessEntity"> | string | null
     phone?: StringNullableFilter<"BusinessEntity"> | string | null
     website?: StringNullableFilter<"BusinessEntity"> | string | null
@@ -12124,6 +12183,8 @@ export namespace Prisma {
     categories?: SortOrder
     primaryCategory?: SortOrderInput | SortOrder
     businessModel?: SortOrderInput | SortOrder
+    businessDescription?: SortOrderInput | SortOrder
+    operationalSummary?: SortOrderInput | SortOrder
     legalEntity?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     website?: SortOrderInput | SortOrder
@@ -12156,6 +12217,8 @@ export namespace Prisma {
     categories?: StringNullableListFilter<"BusinessEntity">
     primaryCategory?: StringNullableFilter<"BusinessEntity"> | string | null
     businessModel?: StringNullableFilter<"BusinessEntity"> | string | null
+    businessDescription?: StringNullableFilter<"BusinessEntity"> | string | null
+    operationalSummary?: StringNullableFilter<"BusinessEntity"> | string | null
     legalEntity?: StringNullableFilter<"BusinessEntity"> | string | null
     phone?: StringNullableFilter<"BusinessEntity"> | string | null
     website?: StringNullableFilter<"BusinessEntity"> | string | null
@@ -12185,6 +12248,8 @@ export namespace Prisma {
     categories?: SortOrder
     primaryCategory?: SortOrderInput | SortOrder
     businessModel?: SortOrderInput | SortOrder
+    businessDescription?: SortOrderInput | SortOrder
+    operationalSummary?: SortOrderInput | SortOrder
     legalEntity?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     website?: SortOrderInput | SortOrder
@@ -12221,6 +12286,8 @@ export namespace Prisma {
     categories?: StringNullableListFilter<"BusinessEntity">
     primaryCategory?: StringNullableWithAggregatesFilter<"BusinessEntity"> | string | null
     businessModel?: StringNullableWithAggregatesFilter<"BusinessEntity"> | string | null
+    businessDescription?: StringNullableWithAggregatesFilter<"BusinessEntity"> | string | null
+    operationalSummary?: StringNullableWithAggregatesFilter<"BusinessEntity"> | string | null
     legalEntity?: StringNullableWithAggregatesFilter<"BusinessEntity"> | string | null
     phone?: StringNullableWithAggregatesFilter<"BusinessEntity"> | string | null
     website?: StringNullableWithAggregatesFilter<"BusinessEntity"> | string | null
@@ -12248,6 +12315,8 @@ export namespace Prisma {
     classificationConfidence?: FloatNullableFilter<"Prospect"> | number | null
     businessModel?: StringNullableFilter<"Prospect"> | string | null
     businessModelConfidence?: FloatNullableFilter<"Prospect"> | number | null
+    businessDescription?: StringNullableFilter<"Prospect"> | string | null
+    operationalSummary?: StringNullableFilter<"Prospect"> | string | null
     websiteStatus?: EnumWebsiteStatusFilter<"Prospect"> | $Enums.WebsiteStatus
     websiteUrl?: StringNullableFilter<"Prospect"> | string | null
     websiteConfidence?: FloatNullableFilter<"Prospect"> | number | null
@@ -12288,6 +12357,8 @@ export namespace Prisma {
     classificationConfidence?: SortOrderInput | SortOrder
     businessModel?: SortOrderInput | SortOrder
     businessModelConfidence?: SortOrderInput | SortOrder
+    businessDescription?: SortOrderInput | SortOrder
+    operationalSummary?: SortOrderInput | SortOrder
     websiteStatus?: SortOrder
     websiteUrl?: SortOrderInput | SortOrder
     websiteConfidence?: SortOrderInput | SortOrder
@@ -12331,6 +12402,8 @@ export namespace Prisma {
     classificationConfidence?: FloatNullableFilter<"Prospect"> | number | null
     businessModel?: StringNullableFilter<"Prospect"> | string | null
     businessModelConfidence?: FloatNullableFilter<"Prospect"> | number | null
+    businessDescription?: StringNullableFilter<"Prospect"> | string | null
+    operationalSummary?: StringNullableFilter<"Prospect"> | string | null
     websiteStatus?: EnumWebsiteStatusFilter<"Prospect"> | $Enums.WebsiteStatus
     websiteUrl?: StringNullableFilter<"Prospect"> | string | null
     websiteConfidence?: FloatNullableFilter<"Prospect"> | number | null
@@ -12371,6 +12444,8 @@ export namespace Prisma {
     classificationConfidence?: SortOrderInput | SortOrder
     businessModel?: SortOrderInput | SortOrder
     businessModelConfidence?: SortOrderInput | SortOrder
+    businessDescription?: SortOrderInput | SortOrder
+    operationalSummary?: SortOrderInput | SortOrder
     websiteStatus?: SortOrder
     websiteUrl?: SortOrderInput | SortOrder
     websiteConfidence?: SortOrderInput | SortOrder
@@ -12416,6 +12491,8 @@ export namespace Prisma {
     classificationConfidence?: FloatNullableWithAggregatesFilter<"Prospect"> | number | null
     businessModel?: StringNullableWithAggregatesFilter<"Prospect"> | string | null
     businessModelConfidence?: FloatNullableWithAggregatesFilter<"Prospect"> | number | null
+    businessDescription?: StringNullableWithAggregatesFilter<"Prospect"> | string | null
+    operationalSummary?: StringNullableWithAggregatesFilter<"Prospect"> | string | null
     websiteStatus?: EnumWebsiteStatusWithAggregatesFilter<"Prospect"> | $Enums.WebsiteStatus
     websiteUrl?: StringNullableWithAggregatesFilter<"Prospect"> | string | null
     websiteConfidence?: FloatNullableWithAggregatesFilter<"Prospect"> | number | null
@@ -12949,6 +13026,8 @@ export namespace Prisma {
     categories?: BusinessEntityCreatecategoriesInput | string[]
     primaryCategory?: string | null
     businessModel?: string | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     legalEntity?: string | null
     phone?: string | null
     website?: string | null
@@ -12978,6 +13057,8 @@ export namespace Prisma {
     categories?: BusinessEntityCreatecategoriesInput | string[]
     primaryCategory?: string | null
     businessModel?: string | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     legalEntity?: string | null
     phone?: string | null
     website?: string | null
@@ -13007,6 +13088,8 @@ export namespace Prisma {
     categories?: BusinessEntityUpdatecategoriesInput | string[]
     primaryCategory?: NullableStringFieldUpdateOperationsInput | string | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     legalEntity?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13036,6 +13119,8 @@ export namespace Prisma {
     categories?: BusinessEntityUpdatecategoriesInput | string[]
     primaryCategory?: NullableStringFieldUpdateOperationsInput | string | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     legalEntity?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13065,6 +13150,8 @@ export namespace Prisma {
     categories?: BusinessEntityCreatecategoriesInput | string[]
     primaryCategory?: string | null
     businessModel?: string | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     legalEntity?: string | null
     phone?: string | null
     website?: string | null
@@ -13093,6 +13180,8 @@ export namespace Prisma {
     categories?: BusinessEntityUpdatecategoriesInput | string[]
     primaryCategory?: NullableStringFieldUpdateOperationsInput | string | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     legalEntity?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13121,6 +13210,8 @@ export namespace Prisma {
     categories?: BusinessEntityUpdatecategoriesInput | string[]
     primaryCategory?: NullableStringFieldUpdateOperationsInput | string | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     legalEntity?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13143,6 +13234,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -13183,6 +13276,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -13219,6 +13314,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -13259,6 +13356,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -13297,6 +13396,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -13332,6 +13433,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -13369,6 +13472,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -14075,6 +14180,8 @@ export namespace Prisma {
     categories?: SortOrder
     primaryCategory?: SortOrder
     businessModel?: SortOrder
+    businessDescription?: SortOrder
+    operationalSummary?: SortOrder
     legalEntity?: SortOrder
     phone?: SortOrder
     website?: SortOrder
@@ -14108,6 +14215,8 @@ export namespace Prisma {
     longitude?: SortOrder
     primaryCategory?: SortOrder
     businessModel?: SortOrder
+    businessDescription?: SortOrder
+    operationalSummary?: SortOrder
     legalEntity?: SortOrder
     phone?: SortOrder
     website?: SortOrder
@@ -14132,6 +14241,8 @@ export namespace Prisma {
     longitude?: SortOrder
     primaryCategory?: SortOrder
     businessModel?: SortOrder
+    businessDescription?: SortOrder
+    operationalSummary?: SortOrder
     legalEntity?: SortOrder
     phone?: SortOrder
     website?: SortOrder
@@ -14262,6 +14373,8 @@ export namespace Prisma {
     classificationConfidence?: SortOrder
     businessModel?: SortOrder
     businessModelConfidence?: SortOrder
+    businessDescription?: SortOrder
+    operationalSummary?: SortOrder
     websiteStatus?: SortOrder
     websiteUrl?: SortOrder
     websiteConfidence?: SortOrder
@@ -14310,6 +14423,8 @@ export namespace Prisma {
     classificationConfidence?: SortOrder
     businessModel?: SortOrder
     businessModelConfidence?: SortOrder
+    businessDescription?: SortOrder
+    operationalSummary?: SortOrder
     websiteStatus?: SortOrder
     websiteUrl?: SortOrder
     websiteConfidence?: SortOrder
@@ -14345,6 +14460,8 @@ export namespace Prisma {
     classificationConfidence?: SortOrder
     businessModel?: SortOrder
     businessModelConfidence?: SortOrder
+    businessDescription?: SortOrder
+    operationalSummary?: SortOrder
     websiteStatus?: SortOrder
     websiteUrl?: SortOrder
     websiteConfidence?: SortOrder
@@ -15516,6 +15633,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -15554,6 +15673,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -15621,6 +15742,8 @@ export namespace Prisma {
     classificationConfidence?: FloatNullableFilter<"Prospect"> | number | null
     businessModel?: StringNullableFilter<"Prospect"> | string | null
     businessModelConfidence?: FloatNullableFilter<"Prospect"> | number | null
+    businessDescription?: StringNullableFilter<"Prospect"> | string | null
+    operationalSummary?: StringNullableFilter<"Prospect"> | string | null
     websiteStatus?: EnumWebsiteStatusFilter<"Prospect"> | $Enums.WebsiteStatus
     websiteUrl?: StringNullableFilter<"Prospect"> | string | null
     websiteConfidence?: FloatNullableFilter<"Prospect"> | number | null
@@ -15662,6 +15785,8 @@ export namespace Prisma {
     categories?: BusinessEntityCreatecategoriesInput | string[]
     primaryCategory?: string | null
     businessModel?: string | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     legalEntity?: string | null
     phone?: string | null
     website?: string | null
@@ -15690,6 +15815,8 @@ export namespace Prisma {
     categories?: BusinessEntityCreatecategoriesInput | string[]
     primaryCategory?: string | null
     businessModel?: string | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     legalEntity?: string | null
     phone?: string | null
     website?: string | null
@@ -15819,6 +15946,8 @@ export namespace Prisma {
     categories?: BusinessEntityUpdatecategoriesInput | string[]
     primaryCategory?: NullableStringFieldUpdateOperationsInput | string | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     legalEntity?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15847,6 +15976,8 @@ export namespace Prisma {
     categories?: BusinessEntityUpdatecategoriesInput | string[]
     primaryCategory?: NullableStringFieldUpdateOperationsInput | string | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     legalEntity?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15962,6 +16093,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -16001,6 +16134,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -16052,6 +16187,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -16091,6 +16228,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -16126,6 +16265,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -16164,6 +16305,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -16263,6 +16406,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -16298,6 +16443,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -16336,6 +16483,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -16373,6 +16522,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -16441,6 +16592,8 @@ export namespace Prisma {
     classificationConfidence?: number | null
     businessModel?: string | null
     businessModelConfidence?: number | null
+    businessDescription?: string | null
+    operationalSummary?: string | null
     websiteStatus?: $Enums.WebsiteStatus
     websiteUrl?: string | null
     websiteConfidence?: number | null
@@ -16476,6 +16629,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -16514,6 +16669,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -16551,6 +16708,8 @@ export namespace Prisma {
     classificationConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
     businessModel?: NullableStringFieldUpdateOperationsInput | string | null
     businessModelConfidence?: NullableFloatFieldUpdateOperationsInput | number | null
+    businessDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    operationalSummary?: NullableStringFieldUpdateOperationsInput | string | null
     websiteStatus?: EnumWebsiteStatusFieldUpdateOperationsInput | $Enums.WebsiteStatus
     websiteUrl?: NullableStringFieldUpdateOperationsInput | string | null
     websiteConfidence?: NullableFloatFieldUpdateOperationsInput | number | null

@@ -79,6 +79,8 @@ export class ExportService {
           'Priority',
           'Status',
           'Source',
+          'Penjelasan Bidang Usaha (Business Activity)',
+          'Lokasi Operasional (Where It Operates)',
         ];
 
         const rows = prospects.map((p) => [
@@ -98,6 +100,8 @@ export class ExportService {
           p.priority ?? '',
           p.leadStatus,
           p.sourceType,
+          `"${(p.businessDescription || p.notes || '').replace(/"/g, '""')}"`,
+          `"${(p.operationalSummary || `${p.city || ''}, ${p.country || ''}`).replace(/"/g, '""')}"`,
         ]);
 
         const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');

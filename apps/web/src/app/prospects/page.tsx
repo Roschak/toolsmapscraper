@@ -434,6 +434,11 @@ function ProspectsContent() {
                             <MapPin className="w-3 h-3 text-cyan-400 shrink-0" />
                             <span>{prospect.city || 'Global'}, {prospect.country || 'ID'}</span>
                           </p>
+                          {(prospect.operationalSummary || prospect.businessDescription) && (
+                            <p className="text-[10px] text-cyan-300/80 line-clamp-1 mt-1 font-sans">
+                              ⚡ {prospect.operationalSummary || prospect.businessDescription}
+                            </p>
+                          )}
                         </td>
 
                         {/* Classification */}
@@ -591,6 +596,15 @@ function ProspectsContent() {
                     <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     <span>{prospect.address || `${prospect.city}, ${prospect.country}`}</span>
                   </p>
+                  <div className="mt-2.5 bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 text-[11px]">
+                    <div className="flex items-center space-x-1 text-cyan-300 font-semibold mb-0.5">
+                      <Building2 className="w-3 h-3 text-cyan-400 shrink-0" />
+                      <span>Bergerak di bidang:</span>
+                    </div>
+                    <p className="text-slate-300 line-clamp-2 leading-relaxed">
+                      {prospect.operationalSummary || prospect.businessDescription || prospect.notes || 'Entitas usaha komersial terdaftar.'}
+                    </p>
+                  </div>
 
                   <div className="mt-3.5">
                     {prospect.websiteStatus === 'NO_WEBSITE_LISTED' ? (
@@ -677,6 +691,65 @@ function ProspectsContent() {
               >
                 <X className="w-5 h-5" />
               </button>
+            </div>
+
+            {/* Detail Penjelasan Bergerak di Bidang Apa & Di Mana */}
+            <div className="p-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 space-y-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-300">
+                  <Building2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                    Penjelasan Bidang Usaha & Lokasi Operasional
+                  </h3>
+                  <p className="text-[11px] text-cyan-300/80">
+                    Detail sektor bisnis, aktivitas operasional, dan lokasi bergerak
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2.5 text-xs bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Bergerak di Bidang (Sektor & Model):
+                  </span>
+                  <p className="text-xs font-bold text-cyan-200 mt-0.5 flex items-center space-x-2">
+                    <span>{selectedProspect.customFields?.sector || selectedProspect.classification || 'Komersial & Jasa'}</span>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">
+                      Model {selectedProspect.businessModel || 'B2C'}
+                    </span>
+                  </p>
+                </div>
+
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Aktivitas Utama & Operasional:
+                  </span>
+                  <p className="text-xs text-slate-200 leading-relaxed mt-0.5">
+                    {selectedProspect.customFields?.operationalFocus || selectedProspect.operationalSummary || 'Penyediaan produk dan layanan komersial langsung kepada pelanggan.'}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Wilayah / Di Mana Bergerak:
+                  </span>
+                  <p className="text-xs text-emerald-300 font-medium flex items-center space-x-1.5 mt-0.5">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>{selectedProspect.address ? `Beroperasi di ${selectedProspect.address}` : `Beroperasi di wilayah ${selectedProspect.city || ''}, ${selectedProspect.country || ''}`}</span>
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-slate-800/80">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Deskripsi Lengkap Hasil Scraping:
+                  </span>
+                  <p className="text-xs text-slate-300 leading-relaxed mt-1 italic bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                    &ldquo;{selectedProspect.businessDescription || selectedProspect.notes || `${selectedProspect.businessName} bergerak di bidang ${selectedProspect.classification || 'usaha komersial'} di ${selectedProspect.city}, ${selectedProspect.country}.`}&rdquo;
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Quick Action Toolbar */}

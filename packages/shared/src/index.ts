@@ -94,6 +94,7 @@ export const SourceType = {
   FOURSQUARE: 'FOURSQUARE',
   OVERTURE: 'OVERTURE',
   GEOAPIFY: 'GEOAPIFY',
+  OPEN_STREET_MAP: 'OPEN_STREET_MAP',
   USER_IMPORT: 'USER_IMPORT',
   MANUAL: 'MANUAL',
   MOCK_PROVIDER: 'MOCK_PROVIDER',
@@ -115,6 +116,8 @@ export interface BusinessEntityDto {
   categories: string[];
   primaryCategory?: string | null;
   businessModel?: string | null;
+  businessDescription?: string | null;
+  operationalSummary?: string | null;
   legalEntity?: string | null;
   phone?: string | null;
   website?: string | null;
@@ -149,6 +152,8 @@ export interface ProspectDto {
   classificationConfidence?: number | null;
   businessModel?: string | null;
   businessModelConfidence?: number | null;
+  businessDescription?: string | null;
+  operationalSummary?: string | null;
   websiteStatus: WebsiteStatus;
   websiteUrl?: string | null;
   websiteConfidence?: number | null;

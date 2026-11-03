@@ -31,14 +31,34 @@ test('2. Security Engine - JWT Signing & Verification & RBAC', () => {
   assert.strictEqual(SecurityUtil.hasPermission('VIEWER', ['SALES']), false);
 });
 
-test('3. Classification Engine - Industry Taxonomy & Business Model', () => {
-  const r1 = ClassificationEngine.classify('Kurnia Bistro & Coffee', ['cafe', 'restaurant']);
-  assert.strictEqual(r1.subCategory, 'Food & Beverage');
-  assert.strictEqual(r1.businessModel, 'B2C');
+test('3. Classification Engine - Industry Taxonomy & Business Explanation & Location', () => {
+  const r1 = ClassificationEngine.classify({
+    businessName: 'Kurnia Kafe & Roastery',
+    rawCategories: ['cafe', 'coffee'],
+    city: 'Bandung',
+    country: 'Indonesia',
+    address: 'Jl. Riau No. 12',
+    websiteStatus: 'NO_WEBSITE_LISTED',
+  });
 
-  const r2 = ClassificationEngine.classify('Nexus Digital Software Studio', ['tech', 'agency']);
-  assert.strictEqual(r2.subCategory, 'Technology & Digital');
+  assert.strictEqual(r1.industry, 'Food & Hospitality');
+  assert.strictEqual(r1.businessModel, 'B2C');
+  assert.ok(r1.businessDescription.includes('Kurnia Kafe & Roastery'));
+  assert.ok(r1.businessDescription.includes('Kuliner'));
+  assert.ok(r1.businessDescription.includes('Bandung'));
+  assert.ok(r1.operatingLocation.includes('Bandung'));
+  assert.ok(r1.operationalFocus.length > 10);
+
+  const r2 = ClassificationEngine.classify({
+    businessName: 'Nexus Legal Tax & Corporate Advisory',
+    rawCategories: ['law', 'legal', 'tax', 'consultant'],
+    city: 'Jakarta',
+    country: 'Indonesia',
+  });
+  assert.strictEqual(r2.industry, 'Professional Services');
   assert.strictEqual(r2.businessModel, 'B2B');
+  assert.ok(r2.businessDescription.includes('Layanan Hukum'));
+  assert.ok(r2.businessDescription.includes('Jakarta'));
 });
 
 test('4. Website Discovery Engine - Opportunity Detection', () => {
@@ -108,7 +128,7 @@ test('6. Entity Resolution Engine - Deduplication & Proximity', () => {
   assert.strictEqual(unrelated.isMatch, false);
 });
 
-test('7. Search Engine Orchestrator - Full Multi-Stage Pipeline', async () => {
+test('7. Search Engine Orchestrator - Full Multi-Stage Pipeline with Business Explanations', async () => {
   const result = await SearchEngine.searchAndEnrich({
     city: 'Jakarta',
     country: 'Indonesia',
@@ -122,6 +142,9 @@ test('7. Search Engine Orchestrator - Full Multi-Stage Pipeline', async () => {
 
   const first = result.candidates[0];
   assert.ok(first.tags.includes('Healthcare & Wellness'));
+  assert.ok(first.businessDescription, 'Candidate must have businessDescription');
+  assert.ok(first.operationalSummary, 'Candidate must have operationalSummary');
+  assert.ok(first.customFields?.sector, 'Candidate must have customFields.sector');
 });
 
 test('8. Lead Ingestion & Opportunity Auditing from CSV / Raw Dataset', () => {
@@ -154,4 +177,3 @@ test('9. Demo Tracking & Pipeline State Governance', () => {
   const demoUrl = 'https://demo.prospecthunter.com/preview/kurnia-bistro';
   assert.ok(/^https?:\/\//i.test(demoUrl), 'Demo URL must be valid HTTP/HTTPS URI');
 });
-

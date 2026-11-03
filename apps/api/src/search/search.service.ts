@@ -75,6 +75,8 @@ export class SearchService {
               categories: candidate.raw.categories,
               primaryCategory: candidate.classification,
               businessModel: candidate.businessModel,
+              businessDescription: candidate.businessDescription,
+              operationalSummary: candidate.operationalSummary,
               phone: candidate.phone,
               website: candidate.websiteUrl,
               rating: candidate.rating,
@@ -96,6 +98,8 @@ export class SearchService {
             classification: candidate.classification,
             classificationConfidence: candidate.classificationConfidence,
             businessModel: candidate.businessModel,
+              businessDescription: candidate.businessDescription,
+              operationalSummary: candidate.operationalSummary,
             businessModelConfidence: candidate.businessModelConfidence,
             websiteStatus: candidate.websiteStatus,
             websiteUrl: candidate.websiteUrl,
@@ -115,6 +119,7 @@ export class SearchService {
             leadStatus: candidate.leadStatus,
             notes: candidate.notes,
             tags: candidate.tags,
+            customFields: candidate.customFields,
           },
         });
 
