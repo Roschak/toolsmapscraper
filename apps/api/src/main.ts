@@ -22,7 +22,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const port = process.env.API_PORT || process.env.PORT || 4000;
-  await app.listen(port);
-  console.log(`ProspectHunter API is running on http://localhost:${port}/api`);
+  await app.listen(port, '0.0.0.0');
+  console.log(`ProspectHunter API is running on port ${port}`);
 }
 bootstrap();
