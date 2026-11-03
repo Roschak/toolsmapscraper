@@ -35,6 +35,7 @@
     "@prospecthunter/security": "workspace:*",
     "@prospecthunter/shared": "workspace:*",
     "@prospecthunter/website-discovery": "workspace:*",
+    "dotenv": "^18.0.9",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
