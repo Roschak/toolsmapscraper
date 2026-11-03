@@ -32,6 +32,8 @@ import {
   Copy,
   Check,
   Navigation,
+  Tag,
+  Briefcase,
 } from 'lucide-react';
 import { api, Prospect } from '../../lib/api';
 
@@ -455,16 +457,16 @@ function ProspectsContent() {
       {viewMode === 'table' ? (
         <div className="glass-panel rounded-2xl overflow-hidden border border-slate-800">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs min-w-[1100px]">
               <thead className="bg-slate-950/70 text-slate-400 font-semibold border-b border-slate-800">
                 <tr>
-                  <th className="py-3 px-4">Business & City</th>
-                  <th className="py-3 px-4">Sector</th>
-                  <th className="py-3 px-4">Website Intelligence</th>
-                  <th className="py-3 px-4">Contact & Reviews</th>
-                  <th className="py-3 px-4">Lead Score</th>
-                  <th className="py-3 px-4">Pipeline Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4 w-[240px] min-w-[220px]">Business & Location</th>
+                  <th className="py-3 px-4 w-[290px] min-w-[260px]">Sector & Fokus Usaha</th>
+                  <th className="py-3 px-4 w-[170px] min-w-[150px]">Website Intelligence</th>
+                  <th className="py-3 px-4 w-[160px] min-w-[140px]">Contact & Reviews</th>
+                  <th className="py-3 px-4 w-[110px] min-w-[100px]">Lead Score</th>
+                  <th className="py-3 px-4 w-[140px] min-w-[130px]">Pipeline Status</th>
+                  <th className="py-3 px-4 w-[110px] min-w-[100px] text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 text-slate-300">
@@ -481,39 +483,57 @@ function ProspectsContent() {
                         }`}
                         onClick={() => setSelectedProspect(prospect)}
                       >
-                        {/* Name & City */}
-                        <td className="py-3.5 px-4">
-                          <p className="font-bold text-white text-xs tracking-tight flex items-center space-x-1.5 group-hover:text-cyan-300 transition-colors">
-                            <span>{prospect.businessName}</span>
-                            {isHot && (
-                              <span title="Hot Opportunity">
-                                <Flame className="w-3.5 h-3.5 text-rose-400 shrink-0 inline" />
-                              </span>
-                            )}
-                          </p>
-                          <p className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
-                            <MapPin className="w-3 h-3 text-cyan-400 shrink-0" />
-                            <span>{prospect.city || 'Global'}, {prospect.country || 'ID'}</span>
-                          </p>
-                          {(prospect.operationalSummary || prospect.businessDescription) && (
-                            <p className="text-[10px] text-cyan-300/80 line-clamp-1 mt-1 font-sans">
-                              ⚡ {prospect.operationalSummary || prospect.businessDescription}
+                        {/* Name & Location */}
+                        <td className="py-3.5 px-4 align-top">
+                          <div className="space-y-1">
+                            <p className="font-bold text-white text-xs tracking-tight flex items-center space-x-1.5 group-hover:text-cyan-300 transition-colors">
+                              <span className="truncate max-w-[190px]" title={prospect.businessName}>{prospect.businessName}</span>
+                              {isHot && (
+                                <span title="Hot Opportunity">
+                                  <Flame className="w-3.5 h-3.5 text-rose-400 shrink-0 inline" />
+                                </span>
+                              )}
                             </p>
-                          )}
+                            <p className="text-[11px] text-slate-400 flex items-center space-x-1">
+                              <MapPin className="w-3 h-3 text-cyan-400 shrink-0" />
+                              <span className="truncate max-w-[190px]">{prospect.city || 'Global'}, {prospect.country || 'ID'}</span>
+                            </p>
+                            {prospect.address && (
+                              <p className="text-[10px] text-slate-500 truncate max-w-[200px]" title={prospect.address}>
+                                {prospect.address}
+                              </p>
+                            )}
+                          </div>
                         </td>
 
-                        {/* Classification */}
-                        <td className="py-3.5 px-4">
-                          <span className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px] font-medium text-slate-300">
-                            {prospect.classification || 'Retail & Service'}
-                          </span>
+                        {/* Sector & Fokus Usaha */}
+                        <td className="py-3.5 px-4 align-top">
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-md bg-cyan-950/60 border border-cyan-800/50 text-[11px] font-medium text-cyan-300">
+                                <Tag className="w-3 h-3 text-cyan-400 shrink-0" />
+                                <span className="line-clamp-1">{prospect.classification || 'Retail & Service'}</span>
+                              </span>
+                              {prospect.businessModel && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-slate-900 text-slate-400 border border-slate-800">
+                                  {prospect.businessModel}
+                                </span>
+                              )}
+                            </div>
+                            <p
+                              className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed"
+                              title={prospect.operationalSummary || prospect.businessDescription || ''}
+                            >
+                              {prospect.operationalSummary || prospect.businessDescription || 'Entitas bisnis komersial terdaftar.'}
+                            </p>
+                          </div>
                         </td>
 
                         {/* Website Intelligence */}
-                        <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
+                        <td className="py-3.5 px-4 align-top" onClick={(e) => e.stopPropagation()}>
                           {prospect.websiteStatus === 'NO_WEBSITE_LISTED' ? (
                             <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[11px] font-bold">
-                              <AlertCircle className="w-3 h-3" />
+                              <AlertCircle className="w-3 h-3 shrink-0" />
                               <span>No Website Listed</span>
                             </span>
                           ) : prospect.websiteStatus === 'SOCIAL_ONLY' ? (
@@ -528,20 +548,20 @@ function ProspectsContent() {
                               className="inline-flex items-center space-x-1 text-slate-400 hover:text-cyan-400 text-[11px]"
                             >
                               <span className="truncate max-w-[130px]">{prospect.websiteUrl}</span>
-                              <ExternalLink className="w-3 h-3" />
+                              <ExternalLink className="w-3 h-3 shrink-0" />
                             </a>
                           )}
                         </td>
 
                         {/* Contact & Reviews */}
-                        <td className="py-3.5 px-4">
-                          <div className="space-y-0.5">
+                        <td className="py-3.5 px-4 align-top">
+                          <div className="space-y-1">
                             <p className="font-mono text-slate-200 text-[11px] flex items-center space-x-1">
-                              <Phone className="w-3 h-3 text-slate-400" />
+                              <Phone className="w-3 h-3 text-slate-400 shrink-0" />
                               <span>{prospect.phone || 'No phone'}</span>
                             </p>
                             <div className="flex items-center space-x-1 text-[11px] text-amber-400 font-semibold">
-                              <Star className="w-3 h-3 fill-amber-400" />
+                              <Star className="w-3 h-3 fill-amber-400 shrink-0" />
                               <span>{prospect.rating ? prospect.rating.toFixed(1) : '4.0'}</span>
                               <span className="text-slate-500 font-normal">({prospect.reviewCount || 100})</span>
                             </div>
@@ -549,7 +569,7 @@ function ProspectsContent() {
                         </td>
 
                         {/* Lead Viability Score */}
-                        <td className="py-3.5 px-4">
+                        <td className="py-3.5 px-4 align-top">
                           <div className="flex items-center space-x-2">
                             <div className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center font-mono">
                               <span className={`text-xs font-black ${isHot ? 'text-rose-400' : 'text-cyan-400'}`}>
@@ -563,12 +583,12 @@ function ProspectsContent() {
                         </td>
 
                         {/* Pipeline Status Dropdown */}
-                        <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
+                        <td className="py-3.5 px-4 align-top" onClick={(e) => e.stopPropagation()}>
                           <select
                             value={prospect.leadStatus || 'NEW'}
                             disabled={statusUpdating === prospect.id}
                             onChange={(e) => handleStatusUpdate(prospect.id, e.target.value)}
-                            className="bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-slate-200 focus:outline-none focus:border-cyan-400 transition-colors cursor-pointer"
+                            className="bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-slate-200 focus:outline-none focus:border-cyan-400 transition-colors cursor-pointer w-full max-w-[130px]"
                           >
                             <option value="NEW">New Lead</option>
                             <option value="RESEARCHED">Researched</option>
@@ -582,7 +602,7 @@ function ProspectsContent() {
                         </td>
 
                         {/* Actions */}
-                        <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                        <td className="py-3.5 px-4 align-top text-right" onClick={(e) => e.stopPropagation()}>
                           <div className="inline-flex items-center space-x-1.5">
                             {waLink && (
                               <a
@@ -637,15 +657,15 @@ function ProspectsContent() {
                 }`}
               >
                 <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                      {prospect.classification || 'Retail'}
+                  <div className="flex items-center justify-between gap-2 mb-2.5">
+                    <span className="px-2.5 py-1 rounded-md bg-cyan-950/60 border border-cyan-800/50 text-[10px] font-bold text-cyan-300 uppercase tracking-wider truncate max-w-[180px]">
+                      {prospect.classification || 'Retail & Service'}
                     </span>
-                    <div className="flex items-center space-x-1.5">
+                    <div className="flex items-center space-x-1.5 shrink-0">
                       <div className="w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center font-mono text-xs font-black text-cyan-400">
                         {prospect.leadScore || 80}
                       </div>
-                      {isHot && <Flame className="w-4 h-4 text-rose-400" />}
+                      {isHot && <Flame className="w-4 h-4 text-rose-400 shrink-0" />}
                     </div>
                   </div>
 
@@ -657,12 +677,19 @@ function ProspectsContent() {
                     <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     <span>{prospect.address || `${prospect.city}, ${prospect.country}`}</span>
                   </p>
-                  <div className="mt-2.5 bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 text-[11px]">
-                    <div className="flex items-center space-x-1 text-cyan-300 font-semibold mb-0.5">
-                      <Building2 className="w-3 h-3 text-cyan-400 shrink-0" />
-                      <span>Bergerak di bidang:</span>
+                  <div className="mt-3 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80 text-[11px] space-y-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-1 text-cyan-300 font-semibold">
+                        <Building2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <span className="text-[11px]">Fokus Usaha & Sektor</span>
+                      </div>
+                      {prospect.businessModel && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono text-slate-400 bg-slate-900 border border-slate-800">
+                          {prospect.businessModel}
+                        </span>
+                      )}
                     </div>
-                    <p className="text-slate-300 line-clamp-2 leading-relaxed">
+                    <p className="text-slate-300 text-[11px] line-clamp-2 leading-relaxed">
                       {prospect.operationalSummary || prospect.businessDescription || prospect.notes || 'Entitas usaha komersial terdaftar.'}
                     </p>
                   </div>
@@ -772,15 +799,18 @@ function ProspectsContent() {
 
               <div className="space-y-2.5 text-xs bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                     Bergerak di Bidang (Sektor & Model):
                   </span>
-                  <p className="text-xs font-bold text-cyan-200 mt-0.5 flex items-center space-x-2">
-                    <span>{selectedProspect.customFields?.sector || selectedProspect.classification || 'Komersial & Jasa'}</span>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">
+                  <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                    <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-cyan-950/60 border border-cyan-800/60 text-cyan-300 font-semibold text-xs">
+                      <Tag className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>{selectedProspect.customFields?.sector || selectedProspect.classification || 'Komersial & Jasa'}</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700">
                       Model {selectedProspect.businessModel || 'B2C'}
                     </span>
-                  </p>
+                  </div>
                 </div>
 
                 <div>
