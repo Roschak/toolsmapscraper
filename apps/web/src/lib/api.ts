@@ -93,10 +93,8 @@ export interface DashboardStats {
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
   (typeof window !== 'undefined'
-    ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:4000/api'
-        : '/api')
-    : 'http://localhost:4000/api');
+    ? '/api'
+    : 'http://localhost:3005/api');
 export const API_BASE_URL = API_BASE;
 
 export function getAuthToken(): string | null {
